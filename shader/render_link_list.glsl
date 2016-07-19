@@ -51,9 +51,9 @@ vec4 calculate_final_color(uint frag_count) {
 	for(uint i = 0; i < frag_count; i++) {
 		uvec4 item = fragments[i];
 		vec4 frag_color = unpackUnorm4x8(item.y);
+		frag_color.w  = 0.2;
 		final_color = blend(final_color, frag_color);
 	}
-    final_color = vec4(1,0,0,1);
 	return final_color;
 
 }
@@ -62,9 +62,9 @@ void main()
 {
 
 	int frag_count = build_local_fragments_list();
-	//sort_fragments_list(frag_count);
-//	vec4 diffuse = calculate_final_color(frag_count);
-	vec4 diffuse = vec4(frag_count/16.0,0,0,1);
+	sort_fragments_list(frag_count);
+	vec4 diffuse = calculate_final_color(frag_count);
+//	vec4 diffuse = vec4(frag_count/16.0,0,0,1);
 //	vec2 xy = gl_GlobalInvocationID.xy;
 	imageStore(out_texture, ivec2(gl_GlobalInvocationID.xy), diffuse);
 }

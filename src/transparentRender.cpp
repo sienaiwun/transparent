@@ -132,6 +132,8 @@ OITrender::OITrender(int w, int h, int k) :m_height(h), m_width(w), m_k(k), m_pS
 	memset(m_data, 0x00, m_total_pixel * sizeof(GLuint));
 	glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
 
+	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+
 	glGenBuffers(1, &m_atomic_counter_buffer);
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomic_counter_buffer);
 	glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), NULL, GL_DYNAMIC_COPY);
@@ -213,8 +215,7 @@ void OITrender::render(Camera * pCamera, textureManager & manager)
 
 
 
-
-	int a = getAtomicCounter(m_atomic_counter_buffer);
+	
 	glUseProgram(m_computerShader);
 	glDispatchComputeIndirect(0);
 	glUseProgram(0);

@@ -157,6 +157,7 @@ int BuildTexture(const char *szPathName, GLuint &texid)
 
 int textureManager::getTexId(const char * texPath)
 {
+	glBindTexture(GL_TEXTURE_2D, 0);
 	if (m_nameToTexId.count(texPath))
 		return m_nameToTexId[texPath];
 	if (texPath[0] == '\0')
@@ -171,7 +172,7 @@ int textureManager::getTexId(const char * texPath)
 	}
 
 	GLuint texid;
-	/*glGenTextures(1, &texid);
+	glGenTextures(1, &texid);
 	glBindTexture(GL_TEXTURE_2D, texid);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -180,8 +181,8 @@ int textureManager::getTexId(const char * texPath)
 	CHECK_ERRORS();
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Iface->width, Iface->height, 0,
 		GL_BGR, GL_UNSIGNED_BYTE, Iface->imageData);
-	CHECK_ERRORS();*/
-	BuildTexture(fullPath.c_str(), texid);
+	CHECK_ERRORS();
+	//BuildTexture(fullPath.c_str(), texid);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	m_nameToTexId.insert(pair<string,int>(texPath,texid));
 	return texid;

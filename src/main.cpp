@@ -116,11 +116,10 @@ void Display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	g_Camera.cameraControl();
 	//g_scene->render(g_bufferShader, texManager, &g_Camera);            // diffuse rendering
+	
 	pOit->render(&g_Camera, texManager);
-	CHECK_ERRORS();
 	drawTex(pOit->getRenderImage());
-	CHECK_ERRORS();
-
+	
 	if (drawFps ) {
 		static char fps_text[32];
 		float fps = g_time.getFps();
