@@ -3,7 +3,7 @@ in vec3 worldPos;
 in vec3 worldNormal;
 in vec2 tc;
 in int out_vertexId;
-
+//layout(early_fragment_tests) in;
 layout( location = 0 ) out vec4 FragColor0;
 layout( location = 1 ) out vec4 FragColor1;
 layout( location = 2 ) out vec4 FragColor2;
@@ -18,6 +18,8 @@ uniform vec3 lightPos;
 uniform int hasTex;
 uniform int objectId;
 uniform float reflectFactor;
+
+
 void main()
 {
 	float reflectValue = reflectFactor;
@@ -34,8 +36,14 @@ void main()
 	{
 		diffuse = objectDiffuseColor;
 	}
-	diffuse = texture2D(objectTex,tc).xyz;
 	float ka = 0.2;
 	FragColor0.xyz = diffuse*(kd+ka)+vec3(0.2,0.2,0.2);
-	
+	/*
+	vec4 test;
+	#define N 100000
+	for(int i =0;i<N;i++)
+	{
+		test.xyz += diffuse*(kd+ka)+vec3(0.2,0.2,0.2);
+	}
+	FragColor0.xyz =test.xyz/N;*/
 }

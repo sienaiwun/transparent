@@ -78,9 +78,11 @@ void Fbo::attachId()
 void Fbo::begin(nv::vec3f clearColor,bool clear)
 {
 	//glBindFramebuffer(GL_FRAMEBUFFER, fboId);
+	CHECK_ERRORS();
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT,&beforeFboId);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
 	glDrawBuffers(num, mybuffers);
+	CHECK_ERRORS();
 	if(clear)
 	{
 		glClearColor(clearColor.x,clearColor.y,clearColor.z,1);
@@ -88,8 +90,8 @@ void Fbo::begin(nv::vec3f clearColor,bool clear)
 		glClearDepth(1.0f);
 	}
 	glEnable(GL_DEPTH_TEST);
+	CHECK_ERRORS();
 	glViewport(0, 0, texDescript.getWidth(), texDescript.getHeight());
-
 }
 
 void Fbo::drawScreenBackBuffer(int w, int h,int newFboId)

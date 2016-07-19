@@ -9,7 +9,7 @@ public:
 	teapotScene()
 	{
 		m_fileName.resize(1);
-		m_fileName[0] = "./model/flower.obj";
+		m_fileName[0] = "./model/leave.obj";
 		extern Camera g_Camera;
 		g_Camera.loadToFIle("./metaData/flower.txt");
 	};

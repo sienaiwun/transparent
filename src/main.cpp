@@ -7,11 +7,48 @@
 #include "macro.h"
 #include "gbuffershader.h"
 #include "teapot.h"
+#include "time.h"
+#include "transparentRender.h"
+Timer g_time;
 Camera g_Camera;
 GbufferShader g_bufferShader;
 Scene* g_scene;
-textureManager texManager(".//model//");
+OITrender * pOit;
+textureManager texManager("");
 bool drawFps = true;
+
+
+
+void drawTex(GLuint mapId)
+{
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, mapId);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glBegin(GL_QUADS);
+	glTexCoord2f(0, 0);
+	glVertex2f(-1.0, -1.0);
+	glTexCoord2f(1, 0);
+	glVertex2f(1.0, -1.0);
+	glTexCoord2f(1, 1);
+	glVertex2f(1.0, 1.0);
+	glTexCoord2f(0, 1);
+	glVertex2f(-1.0, 1.0);
+	glEnd();
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+}
 
 void key(unsigned char k, int x, int y)
 {
@@ -38,6 +75,8 @@ void Reshape(int w, int h)
 
 void Init()
 {
+	freopen("stdout.txt", "w", stdout);
+	freopen("stderr.txt", "w", stderr);
 	glewInit();
 	if (!glewIsSupported(
 		"GL_VERSION_2_0 "
@@ -63,18 +102,23 @@ void Init()
 	g_scene->init();
 	g_bufferShader.init();
 
+	pOit = new OITrender(SCREEN_WIDTH, SCREEN_HEIGHT, K);
+	pOit->setScene(g_scene);
 
 }
 
 
 
-#include "time.h"
-Timer g_time;
+
 void Display()
 {
+	CHECK_ERRORS();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	g_Camera.cameraControl();
-	g_scene->render(g_bufferShader, texManager, &g_Camera);
+	//g_scene->render(g_bufferShader, texManager, &g_Camera);            // diffuse rendering
+	pOit->render(&g_Camera, texManager);
+	CHECK_ERRORS();
+	drawTex(pOit->getRenderImage());
 	CHECK_ERRORS();
 
 	if (drawFps ) {
@@ -94,6 +138,7 @@ void idle()
 
 int main(int argc, char** argv)
 {
+	freopen("stdout.txt","w", stdout);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);

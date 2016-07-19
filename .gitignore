@@ -291,3 +291,6 @@ paket-files/
 *.dll
 *.mtl
 *.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.vcxproj.user

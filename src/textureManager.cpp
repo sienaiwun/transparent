@@ -12,7 +12,9 @@
 #include <crtdbg.h>
 #include <algorithm>
 #include <olectl.h>              
-#include <math.h>              
+#include <math.h>     
+#include <opencv2/opencv.hpp>
+
 
 using namespace std;
 
@@ -23,6 +25,14 @@ textureManager::~textureManager()
 	auto destroyFun = [](map< string, GLuint>::value_type it){glDeleteTextures(1, &(it.second)); };
 	std::for_each(m_nameToTexId.begin(), m_nameToTexId.end(), destroyFun);
 }
+#define CHECK_ERRORS()         \
+	do {                         \
+	GLenum err = glGetError(); \
+	if (err) {                                                       \
+	printf( "GL Error %d at line %d of FILE %s\n", (int)err, __LINE__,__FILE__);       \
+	exit(-1);                                                      \
+					}                                                                \
+					} while(0)
 int BuildTexture(const char *szPathName, GLuint &texid)
 {
 	HDC      hdcTemp;                        // The DC To Hold Our Bitmap
@@ -50,11 +60,9 @@ int BuildTexture(const char *szPathName, GLuint &texid)
 	MultiByteToWideChar(CP_ACP, 0, szPath, -1, wszPath, MAX_PATH);    // Convert From ASCII To Unicode
 	HRESULT hr = OleLoadPicturePath(wszPath, 0, 0, 0, IID_IPicture, (void**)&pPicture);
 
-	if (FAILED(hr))
-	{
-		printf("connot load texture");// If Loading Failed
+	if (FAILED(hr))                            // If Loading Failed
 		return FALSE;                          // Return False
-	}
+
 	hdcTemp = CreateCompatibleDC(GetDC(0));                // Create The Windows Compatible Device Context
 	if (!hdcTemp)                            // Did Creation Fail?
 	{
@@ -120,17 +128,23 @@ int BuildTexture(const char *szPathName, GLuint &texid)
 		else                              // Otherwise
 			pPixel[3] = 255;                      // Set The Alpha Value To 255
 	}
+	BYTE* pData = new BYTE[lWidthPixels*lHeightPixels * 3];
+	for (long i = 0; i < lWidthPixels * lHeightPixels; i++)        // Loop Through All Of The Pixels
+	{
+		pData[3 * i] = pBits[4 * i];
 
+	}
 	glGenTextures(1, &texid);                      // Create The Texture
 
 	// Typical Texture Generation Using Data From The Bitmap
 	glBindTexture(GL_TEXTURE_2D, texid);                // Bind To The Texture ID
 	//glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);    // (Modify This For The Type Of Filtering You Want)
 	//glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // (Modify This For The Type Of Filtering You Want)
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, lWidthPixels, lHeightPixels, 0, GL_RGBA, GL_UNSIGNED_BYTE, pBits);  // (Modify This If You Want Mipmaps)
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA16, lWidthPixels, lHeightPixels, GL_RGBA, GL_UNSIGNED_BYTE, pBits);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, lWidthPixels, lHeightPixels, 0, GL_RGBA, GL_UNSIGNED_BYTE, pBits);  // (Modify This If You Want Mipmaps)
+	CHECK_ERRORS();
+	//gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA16, lWidthPixels, lHeightPixels, GL_RGBA, GL_UNSIGNED_BYTE, pBits);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	DeleteObject(hbmpTemp);                        // Delete The Object
 	DeleteDC(hdcTemp);                          // Delete The Device Context
@@ -147,10 +161,28 @@ int textureManager::getTexId(const char * texPath)
 		return m_nameToTexId[texPath];
 	if (texPath[0] == '\0')
 		return -1;
-	string fullPath = m_textDir + "//" + texPath;
+	string fullPath = m_textDir  + texPath;
+	
+	IplImage *Iface = cvLoadImage(fullPath.c_str());
+	if (!Iface)
+	{
+		printf("file error: %s\n", fullPath.c_str());
+		return -1;
+	}
+
 	GLuint texid;
-	glGenTextures(1, &texid);
+	/*glGenTextures(1, &texid);
+	glBindTexture(GL_TEXTURE_2D, texid);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	CHECK_ERRORS();
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Iface->width, Iface->height, 0,
+		GL_BGR, GL_UNSIGNED_BYTE, Iface->imageData);
+	CHECK_ERRORS();*/
 	BuildTexture(fullPath.c_str(), texid);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	m_nameToTexId.insert(pair<string,int>(texPath,texid));
 	return texid;
 }

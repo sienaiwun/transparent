@@ -169,6 +169,15 @@ int Geometry::getCompiledIndexCount() const
 {
 	return _indices.size();
 }
+
+#define CHECK_ERRORS()         \
+	do {                         \
+	GLenum err = glGetError(); \
+	if (err) {                                                       \
+	printf( "GL Error %d at line %d of FILE %s\n", (int)err, __LINE__,__FILE__);       \
+	exit(-1);                                                      \
+			}                                                                \
+			} while(0)
 void Geometry::render(glslShader & shader,textureManager& manager)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, getVBO());
@@ -176,6 +185,7 @@ void Geometry::render(glslShader & shader,textureManager& manager)
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	CHECK_ERRORS();
 	glVertexAttribPointer(0,
 		getPositionSize(),
 		GL_FLOAT,
@@ -197,21 +207,24 @@ void Geometry::render(glslShader & shader,textureManager& manager)
 		getCompiledVertexSize()*sizeof(float),
 		(void*)(getCompiledTexCoordOffset()*sizeof(float)));
 
-
+	CHECK_ERRORS();
 
 
 	for (int gID = 0; gID < getGroupCount(); gID++)
 	{	
 		if (_materials.size()>0)
 		shader.setMaterial(getGroupMaterial(gID), manager);	
+		CHECK_ERRORS();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, getGroupIBO(gID));
 		glDrawElements(GL_TRIANGLES, getCompiledGroupIndexCount(gID), GL_UNSIGNED_INT, 0);
+		CHECK_ERRORS();
 	}
 
-
+	CHECK_ERRORS();
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
+	CHECK_ERRORS();
 	
 }
 int Geometry::Create_GPU_Buffer()

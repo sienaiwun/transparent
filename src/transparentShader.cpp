@@ -1,7 +1,7 @@
-#include "gBufferShader.h"
+#include "transparentShader.h"
 #include "scene.h"
 
-void GbufferShader::init()
+void TransparentShader::init()
 {
 	m_loader.loadShader(m_vertexFileName.c_str(), 0, m_fragmentFileName.c_str());
 	m_vmpBinding = m_loader.getUniform("MVP");
@@ -16,41 +16,34 @@ void GbufferShader::init()
 
 }
 
-void GbufferShader::setScene(Scene * pScene)
+void TransparentShader::setScene(Scene * pScene)
 {
 	glUniform3fv(m_lightPosBinding, 1, (float*)pScene->getLightPos());
 }
-void GbufferShader::setGeomtryIndex(int i)
+void TransparentShader::setGeomtryIndex(int i)
 {
 	glUniform1i(m_objectId, i);
 
 }
-void GbufferShader::begin()
+void TransparentShader::begin()
 {
 	m_loader.useShder();
 }
-void GbufferShader::end()
+void TransparentShader::end()
 {
 	m_loader.DisUse();
 }
-
-void GbufferShader::setMaterial(const GLMmaterial & material, textureManager & manager)
+void TransparentShader::setMaterial(const GLMmaterial & material, textureManager & manager)
 {
 	glUniform3fv(m_objectDiffuseBinding, 1, material.diffuse);
-	CHECK_ERRORS();
 	int  texid = manager.getTexId(material.diffuse_map);
-	CHECK_ERRORS();
-//	printf("diffuse map:%s\n", material.diffuse_map);
 	if (texid > 0)
 	{
-		glUniform1i(m_hasTex,1);
-		CHECK_ERRORS();
+		glUniform1i(m_hasTex, 1);
 		glActiveTexture(GL_TEXTURE0);
-		CHECK_ERRORS();
 		glBindTexture(GL_TEXTURE_2D, texid);
 
 		glUniform1i(m_objectTexBinding, 0);
-		CHECK_ERRORS();
 	}
 	else
 	{
@@ -59,7 +52,7 @@ void GbufferShader::setMaterial(const GLMmaterial & material, textureManager & m
 	//if (material.ambient_map[0] == 'a');
 
 }
-void GbufferShader::setCamera(Camera *pCamera)
+void TransparentShader::setCamera(Camera *pCamera)
 {
 	m_mvp = pCamera->getMvpMat();
 	m_modelView = pCamera->getModelViewMat();

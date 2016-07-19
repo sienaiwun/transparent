@@ -19,6 +19,12 @@
     <Filter Include="Source Files\shader\diffuseShader">
       <UniqueIdentifier>{488cd5cd-c050-474f-8e6b-cce6c2252b56}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\shader\tranparentShader">
+      <UniqueIdentifier>{62955a4b-a7a6-4b7e-8bc3-c155491f270a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\shader\computerShader">
+      <UniqueIdentifier>{f99ba9df-62c9-4721-b7d3-9f3df7f6fc30}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\glslShader.h">
@@ -60,6 +66,18 @@
     <ClInclude Include="src\teapot.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\transparentShader.h">
+      <Filter>Source Files\shader\tranparentShader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resolveShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shader\utils.h">
+      <Filter>Source Files\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\transparentRender.h">
+      <Filter>Source Files\shader\tranparentShader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera.cpp">
@@ -95,6 +113,15 @@
     <ClCompile Include="src\time.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\transparentShader.cpp">
+      <Filter>Source Files\shader\tranparentShader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resolveShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\transparentRender.cpp">
+      <Filter>Source Files\shader\tranparentShader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\gBuffer.frag">
@@ -105,6 +132,15 @@
     </None>
     <None Include="src\time.h">
       <Filter>Header Files</Filter>
+    </None>
+    <None Include="shader\transparentShader.vert">
+      <Filter>Source Files\shader\tranparentShader</Filter>
+    </None>
+    <None Include="shader\transparentShader.frag">
+      <Filter>Source Files\shader\tranparentShader</Filter>
+    </None>
+    <None Include="shader\render_link_list.glsl">
+      <Filter>Source Files\shader\computerShader</Filter>
     </None>
   </ItemGroup>
 </Project>
