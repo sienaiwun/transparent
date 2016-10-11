@@ -1,4 +1,4 @@
-#include "transparentRender.h"
+#include "transparentFixed.h"
 #include <algorithm>
 
 #define CHECK_ERRORS()         \
@@ -7,8 +7,8 @@
 	if (err) {                                                       \
 	printf( "GL Error %d at line %d of FILE %s\n", (int)err, __LINE__,__FILE__);       \
 	exit(-1);                                                      \
-		}                                                                \
-		} while(0)
+			}                                                                \
+			} while(0)
 
 
 static const char* readCSShaderFile(const char* shaderFileName)
@@ -100,7 +100,7 @@ static GLuint getAtomicCounter(GLuint buffer)
 	return fragsCount;
 }
 #include "gbuffershader.h"
-OITrender::OITrender(int w, int h, int k) :m_height(h), m_width(w), m_k(k), m_pScene(NULL)
+OITFixedRender::OITFixedRender(int w, int h, int k) :m_height(h), m_width(w), m_k(k), m_pScene(NULL)
 {
 	m_renderFbo = Fbo(1, m_width, m_height);
 	m_renderFbo.init();
@@ -109,7 +109,7 @@ OITrender::OITrender(int w, int h, int k) :m_height(h), m_width(w), m_k(k), m_pS
 	testImage.resize(m_width*m_height);
 	auto func = [](nv::vec4f& source){source = nv::vec4f(1, 0, 0, 1); };
 	std::for_each(testImage.begin(), testImage.end(), func);
-	
+
 	CHECK_ERRORS();
 	glBindTexture(GL_TEXTURE_2D, m_renderFbo.getTexture(0));
 
@@ -119,41 +119,53 @@ OITrender::OITrender(int w, int h, int k) :m_height(h), m_width(w), m_k(k), m_pS
 	CHECK_ERRORS();
 	*/
 	m_total_pixel = m_width*m_height;
+
 	glGenTextures(1, &m_head_pointer_texture);
 	glBindTexture(GL_TEXTURE_2D, m_head_pointer_texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, m_width, m_height, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, NULL);
 
-	
+
 	glGenBuffers(1, &m_head_pointer_initializer);
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_head_pointer_initializer);
 	glBufferData(GL_PIXEL_UNPACK_BUFFER, m_total_pixel * sizeof(GLuint), NULL, GL_STATIC_DRAW);
-	
+
 	m_data = (GLuint*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
-	memset(m_data, 0x91, m_total_pixel * sizeof(GLuint));
+	memset(m_data, 0x00, m_total_pixel * sizeof(GLuint));
 	glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
 
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-	
+
+	glGenBuffers(1, &m_atomic_counter_array_buffer);
+	glBindBuffer(GL_TEXTURE_BUFFER, m_atomic_counter_array_buffer);
+	glBufferData(GL_TEXTURE_BUFFER, m_total_pixel*sizeof(GLuint), NULL, GL_DYNAMIC_COPY);
+
+	glGenTextures(1, &m_atomic_counter_array_buffer_texture);
+	glBindTexture(GL_TEXTURE_2D, m_atomic_counter_array_buffer_texture);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32UI, m_fragment_storage_buffer);
+
 	glGenBuffers(1, &m_atomic_counter_buffer);
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomic_counter_buffer);
 	glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), NULL, GL_DYNAMIC_COPY);
+	glBindTexture(GL_TEXTURE_BUFFER, 0);
 
 	glGenBuffers(1, &m_fragment_storage_buffer);
 	glBindBuffer(GL_TEXTURE_BUFFER, m_fragment_storage_buffer);
 	glBufferData(GL_TEXTURE_BUFFER, m_k*m_total_pixel*sizeof(GLfloat) * 4, NULL, GL_DYNAMIC_COPY);
+
+
 
 	glGenTextures(1, &m_linked_list_texture);
 	glBindTexture(GL_TEXTURE_BUFFER, m_linked_list_texture);
 	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32UI, m_fragment_storage_buffer);
 	glBindTexture(GL_TEXTURE_BUFFER, 0);
 	glBindImageTexture(1, m_linked_list_texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32UI);
-	
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 	CHECK_ERRORS();
 
 
 	m_oitShader.init();
-	
+
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, m_width, m_height, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, NULL);
 
 
@@ -171,7 +183,7 @@ OITrender::OITrender(int w, int h, int k) :m_height(h), m_width(w), m_k(k), m_pS
 	} dispatch_params = { m_width / 16, m_height / 16, 1 };
 
 	// RENDER SHADER
-	genComputeProg(m_computerShader, "./shader/render_link_list.glsl");
+	genComputeProg(m_computerShader, "./shader/render_fixed_list.glsl");
 	CHECK_ERRORS();
 	glUseProgram(m_computerShader);
 
@@ -181,37 +193,33 @@ OITrender::OITrender(int w, int h, int k) :m_height(h), m_width(w), m_k(k), m_pS
 	glBufferData(GL_DISPATCH_INDIRECT_BUFFER, sizeof(dispatch_params), &dispatch_params, GL_STATIC_DRAW);
 	glUseProgram(0);
 }
-void OITrender::render(Camera * pCamera, textureManager & manager)
+void OITFixedRender::render(Camera * pCamera, textureManager & manager)
 {
-	
-	assert(m_pScene != NULL);
-	
-	glBindTexture(GL_TEXTURE_2D, m_head_pointer_texture);
+
+	assert(m_pScene != NULL); 
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_head_pointer_initializer);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, m_width, m_height, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, NULL);// 从buffer里面拷贝，更快
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-	
-	glBindImageTexture(0, m_head_pointer_texture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32UI);
+	glBindTexture(GL_TEXTURE_2D, m_head_pointer_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, m_width, m_height, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, NULL);
+	glBindTexture(GL_TEXTURE_2D, m_atomic_counter_array_buffer_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, m_width, m_height, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, NULL);
 
-	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, m_atomic_counter_buffer);
-
-	const GLuint zero = 0;
-	glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(zero), &zero);
-
-
-	
 	glBindImageTexture(0, m_head_pointer_texture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32UI);
 	glBindImageTexture(1, m_linked_list_texture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32UI);
-	glBindImageTexture(2, m_renderFbo.getTexture(0), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+	glBindImageTexture(2, m_atomic_counter_array_buffer_texture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32UI);
+	glBindImageTexture(3, m_renderFbo.getTexture(0), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+	
 	m_oitShader.begin();
 	m_pScene->render(m_oitShader, manager, pCamera);
 	m_oitShader.end();
-	
-	
 
-	
+
+
+	glBindImageTexture(0, m_head_pointer_texture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32UI);
+	glBindImageTexture(1, m_linked_list_texture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32UI);
+	glBindImageTexture(2, m_atomic_counter_array_buffer_texture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32UI);
+	glBindImageTexture(3, m_renderFbo.getTexture(0), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+
 
 
 	
@@ -227,7 +235,7 @@ void OITrender::render(Camera * pCamera, textureManager & manager)
 	CHECK_ERRORS();
 	m_renderFbo.end();
 	CHECK_ERRORS();
-	
 
-	
+
+
 }

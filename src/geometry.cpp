@@ -306,10 +306,12 @@ int Geometry::getTexCoordSize() const
 	return 2;
 }
 
-const GLMmaterial & Geometry::getGroupMaterial(int gID) const
+const GLMmaterial& Geometry::getGroupMaterial(int gID) const
 {
 	int id = _groupMaterial[gID];
-	return (_materials[_groupMaterial[gID]]);
+	const GLMmaterial& meterial = (_materials[id]);
+	printf("%s\n", meterial.diffuse_map);
+	return meterial;
 }
 
 int Geometry::getGroupCount() const

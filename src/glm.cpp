@@ -483,6 +483,8 @@ _glmReadMTL(GLMmodel* model, char* name)
         break;
     }
   }
+  for (int i = 0; i < 7;i++)
+	printf("!!insert map:%s\n", model->materials[i].diffuse_map);
 
   // Make sure we found the same number of materials the second time around.
   // Note that glm adds a default material to the beginning of the array
@@ -626,7 +628,7 @@ _glmFirstPass(GLMmodel* model, FILE* file)
           if (current_material_name)   free(current_material_name);
           return 1;
         }
-        break;
+		 break;
       case 'u':
         /* We need to create groups with their own materials */
         fgets(buf, sizeof(buf), file);

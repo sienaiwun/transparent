@@ -25,6 +25,9 @@
     <Filter Include="Source Files\shader\computerShader">
       <UniqueIdentifier>{f99ba9df-62c9-4721-b7d3-9f3df7f6fc30}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\shader\tranparentFixShader">
+      <UniqueIdentifier>{435b46e6-38c9-4448-960a-7b4cdbc6f768}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\glslShader.h">
@@ -78,6 +81,12 @@
     <ClInclude Include="src\transparentRender.h">
       <Filter>Source Files\shader\tranparentShader</Filter>
     </ClInclude>
+    <ClInclude Include="src\transparentFixed.h">
+      <Filter>Source Files\shader\tranparentFixShader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\transparentFixedShader.h">
+      <Filter>Source Files\shader\tranparentFixShader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera.cpp">
@@ -122,6 +131,12 @@
     <ClCompile Include="src\transparentRender.cpp">
       <Filter>Source Files\shader\tranparentShader</Filter>
     </ClCompile>
+    <ClCompile Include="src\transparentFixed.cpp">
+      <Filter>Source Files\shader\tranparentFixShader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\transparentFixedShader.cpp">
+      <Filter>Source Files\shader\tranparentFixShader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\gBuffer.frag">
@@ -141,6 +156,12 @@
     </None>
     <None Include="shader\render_link_list.glsl">
       <Filter>Source Files\shader\computerShader</Filter>
+    </None>
+    <None Include="shader\render_fixed_list.glsl">
+      <Filter>Source Files\shader\tranparentFixShader</Filter>
+    </None>
+    <None Include="shader\transparentFixedShader.frag">
+      <Filter>Source Files\shader\tranparentFixShader</Filter>
     </None>
   </ItemGroup>
 </Project>

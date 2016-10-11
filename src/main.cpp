@@ -9,6 +9,7 @@
 #include "teapot.h"
 #include "time.h"
 #include "transparentRender.h"
+#include "transparentFixed.h"
 Timer g_time;
 Camera g_Camera;
 GbufferShader g_bufferShader;
@@ -75,8 +76,6 @@ void Reshape(int w, int h)
 
 void Init()
 {
-	freopen("stdout.txt", "w", stdout);
-	freopen("stderr.txt", "w", stderr);
 	glewInit();
 	if (!glewIsSupported(
 		"GL_VERSION_2_0 "
@@ -115,10 +114,10 @@ void Display()
 	CHECK_ERRORS();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	g_Camera.cameraControl();
-	//g_scene->render(g_bufferShader, texManager, &g_Camera);            // diffuse rendering
+	g_scene->render(g_bufferShader, texManager, &g_Camera);            // diffuse rendering
 	
-	pOit->render(&g_Camera, texManager);
-	drawTex(pOit->getRenderImage());
+	//pOit->render(&g_Camera, texManager);
+	//drawTex(pOit->getRenderImage());
 	
 	if (drawFps ) {
 		static char fps_text[32];
@@ -137,7 +136,6 @@ void idle()
 
 int main(int argc, char** argv)
 {
-	freopen("stdout.txt","w", stdout);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
