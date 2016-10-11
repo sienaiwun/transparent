@@ -136,6 +136,8 @@ void idle()
 
 int main(int argc, char** argv)
 {
+	freopen("stdout.txt", "w", stdout);
+	freopen("stderr.txt", "w",stderr);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
