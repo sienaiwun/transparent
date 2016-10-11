@@ -483,9 +483,6 @@ _glmReadMTL(GLMmodel* model, char* name)
         break;
     }
   }
-  for (int i = 0; i < 7;i++)
-	printf("!!insert map:%s\n", model->materials[i].diffuse_map);
-
   // Make sure we found the same number of materials the second time around.
   // Note that glm adds a default material to the beginning of the array
   assert((nummaterials+1) == model->nummaterials);

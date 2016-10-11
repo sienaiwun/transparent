@@ -28,6 +28,18 @@
     <Filter Include="Source Files\shader\tranparentFixShader">
       <UniqueIdentifier>{435b46e6-38c9-4448-960a-7b4cdbc6f768}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\render">
+      <UniqueIdentifier>{836347d9-d0b1-4f1a-b464-8f75f8738b02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\render\eocRender">
+      <UniqueIdentifier>{221214d8-9ff0-4b2d-bd92-5be281f5424d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\shader\edgeShader">
+      <UniqueIdentifier>{0830d6dd-4d41-4006-a886-dcb617817dd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\scene">
+      <UniqueIdentifier>{63891f9e-1666-4055-b3d8-afa22c9d34b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\glslShader.h">
@@ -66,9 +78,6 @@
     <ClInclude Include="src\gbufferShader.h">
       <Filter>Source Files\shader\diffuseShader</Filter>
     </ClInclude>
-    <ClInclude Include="src\teapot.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\transparentShader.h">
       <Filter>Source Files\shader\tranparentShader</Filter>
     </ClInclude>
@@ -86,6 +95,18 @@
     </ClInclude>
     <ClInclude Include="src\transparentFixedShader.h">
       <Filter>Source Files\shader\tranparentFixShader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\globalEoc.h">
+      <Filter>Source Files\render\eocRender</Filter>
+    </ClInclude>
+    <ClInclude Include="src\edgeShader.h">
+      <Filter>Source Files\shader\edgeShader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\quad.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\teapot.h">
+      <Filter>Header Files\scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -137,6 +158,12 @@
     <ClCompile Include="src\transparentFixedShader.cpp">
       <Filter>Source Files\shader\tranparentFixShader</Filter>
     </ClCompile>
+    <ClCompile Include="src\globalEoc.cpp">
+      <Filter>Source Files\render\eocRender</Filter>
+    </ClCompile>
+    <ClCompile Include="src\edgeShader.cpp">
+      <Filter>Source Files\shader\edgeShader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\gBuffer.frag">
@@ -162,6 +189,12 @@
     </None>
     <None Include="shader\transparentFixedShader.frag">
       <Filter>Source Files\shader\tranparentFixShader</Filter>
+    </None>
+    <None Include="shader\edgeDetector.vert">
+      <Filter>Source Files\shader\edgeShader</Filter>
+    </None>
+    <None Include="shader\edgeDetector.frag">
+      <Filter>Source Files\shader\edgeShader</Filter>
     </None>
   </ItemGroup>
 </Project>

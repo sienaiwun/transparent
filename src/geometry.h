@@ -51,7 +51,7 @@ public:
 	int getPositionSize() const;
 	int getNormalSize() const;
 	int getTexCoordSize() const;
-
+	static void drawQuad(glslShader & shader);
 	void render(glslShader & shader, textureManager & manager);
 	//
 	//compiled data access functions

@@ -294,3 +294,4 @@ paket-files/
 *.vcxproj.filters
 *.vcxproj.user
 *.vcxproj.user
+*.png

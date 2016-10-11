@@ -10,11 +10,12 @@
 #include "time.h"
 #include "transparentRender.h"
 #include "transparentFixed.h"
+#include "globalEoc.h"
 Timer g_time;
 Camera g_Camera;
 GbufferShader g_bufferShader;
 Scene* g_scene;
-OITrender * pOit;
+EOCrender * pEoc;
 textureManager texManager("");
 bool drawFps = true;
 
@@ -98,11 +99,9 @@ void Init()
 	glLoadIdentity();
 	wglSwapIntervalEXT(0);
 	g_scene = new teapotScene();
-	g_scene->init();
 	g_bufferShader.init();
-
-	pOit = new OITrender(SCREEN_WIDTH, SCREEN_HEIGHT, K);
-	pOit->setScene(g_scene);
+	pEoc = new EOCrender(SCREEN_WIDTH, SCREEN_HEIGHT);
+	pEoc->setScene(g_scene);
 
 }
 
@@ -114,10 +113,10 @@ void Display()
 	CHECK_ERRORS();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	g_Camera.cameraControl();
-	g_scene->render(g_bufferShader, texManager, &g_Camera);            // diffuse rendering
+	//g_scene->render(g_bufferShader, texManager, &g_Camera);            // diffuse rendering
 	
-	//pOit->render(&g_Camera, texManager);
-	//drawTex(pOit->getRenderImage());
+	pEoc->render(&g_Camera, texManager);
+	drawTex(pEoc->getRenderImage());
 	
 	if (drawFps ) {
 		static char fps_text[32];
@@ -136,6 +135,9 @@ void idle()
 
 int main(int argc, char** argv)
 {
+	freopen("stdout.txt", "w", stdout);
+
+		freopen("stderr.txt", "w", stderr);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);

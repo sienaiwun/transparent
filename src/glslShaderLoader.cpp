@@ -11,6 +11,22 @@
 
 using namespace std;
 
+static int attacthTexID = 0;
+void setShaderTex(GLuint slot, GLuint texId)
+{
+	if (slot != (GLuint)-1)
+	{
+		glActiveTexture(GL_TEXTURE0 + attacthTexID);
+		glBindTexture(GL_TEXTURE_2D, texId);
+		glUniform1i(slot, attacthTexID);
+		attacthTexID++;
+	}
+}
+void resetTexId()
+{
+	attacthTexID = 0;
+}
+
 void glslShaderLoader::loadShader(const char *vetexName_ , const char *geometryName_ ,
 	                                                       const char *fragmentName_ ){
 	SAFE_FREE(vertexName);

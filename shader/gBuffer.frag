@@ -22,9 +22,7 @@ uniform float reflectFactor;
 
 void main()
 {
-	float reflectValue = reflectFactor;
 	vec3 N = normalize(worldNormal);
-	FragColor1 = vec4(N,reflectValue);
 	vec3 L = normalize(lightPos-worldPos);
 	float kd=max(dot(N,L),0);
 	vec3 diffuse;
@@ -38,6 +36,10 @@ void main()
 	}
 	float ka = 0.2;
 	FragColor0.xyz = diffuse*(kd+ka)+vec3(0.2,0.2,0.2);
+	FragColor1.xyz = worldPos;
+	FragColor1.w = 1;
+	FragColor2 = vec4(N,1);
+	
 	/*
 	vec4 test;
 	#define N 100000

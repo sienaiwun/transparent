@@ -4,7 +4,8 @@
 #include<gl\glew.h>
 #include<gl\glut.h>
 
-
+void setShaderTex(GLuint slot, GLuint texId);
+void resetTexId();
 class glslShaderLoader{
 
 protected:

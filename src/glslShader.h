@@ -20,6 +20,7 @@
 
 class Camera;
 class Scene;
+
 class glslShader
 {
 public:

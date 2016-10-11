@@ -9,9 +9,10 @@ public:
 	teapotScene()
 	{
 		m_fileName.resize(1);
-		m_fileName[0] = "./model/sponza/box.obj";
+		m_fileName[0] = "./model/urban/colorUrban.obj";
 		extern Camera g_Camera;
 		g_Camera.loadToFIle("./metaData/flower.txt");
+		init();
 	};
 };
 #endif
