@@ -30,30 +30,36 @@ float getDepthTx(vec2 tc)
 }
 
 #define FISTDIS 0.0005
-float fistDepth(float c,float  l,float r)
+vec2 fistDepth(float c,float  l,float r)
 {
+	vec2 result;
 	if (abs(l+r-2*c)<FISTDIS)
-		return 0;
+		result.x = 0;
 	else
-		return 1;
+		result.x = 1;
+	if(c+FISTDIS<r)
+		result.y = 1;
+	else
+		result.y = 0;
+	return result;
 }
-vec2 firstDisconect(vec2 tc)
+vec4 firstDisconect(vec2 tc)
 {
-vec2 step = 1.0/resolution;
-    vec2 result;
+	vec2 step = 1.0/resolution;
+    vec4 result;
 	float c = getDepthTx(tc);
 	float l = getDepthTx(tc-vec2(step.x,0));
 	float r = getDepthTx(tc+vec2(step.x,0));
 	float t = getDepthTx(tc+vec2(0,step.y));
 	float b = getDepthTx(tc-vec2(0,step.y));
-	result.x = fistDepth(c,l,r);
-	result.y = fistDepth(c,t,b);
+	result.xy = fistDepth(c,l,r);
+	result.zw = fistDepth(c,t,b);
 	return result;
 }
 
 
 void main()
 {
-		vec2 result = firstDisconect(tc);
-		color0.xyzw = vec4( result,0,1);
+		vec4 result = firstDisconect(tc);
+		color0.xyzw = result;
 }

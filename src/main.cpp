@@ -58,7 +58,13 @@ void key(unsigned char k, int x, int y)
 	switch (k)
 	{
 	case 'p':
-		g_Camera.printToFile("./metaData/flower.txt");
+		g_Camera.printToFile(g_scene->getCameraFile());
+		break;
+	case ' ':
+		g_Camera.moveTo(2,20);
+		break;
+	case 't':
+		pEoc->debugSwap();
 		break;
 	}
 	glutPostRedisplay();
@@ -99,10 +105,11 @@ void Init()
 	glLoadIdentity();
 	wglSwapIntervalEXT(0);
 	g_scene = new teapotScene();
+	g_scene->LoadCamera(&g_Camera);
 	g_bufferShader.init();
 	pEoc = new EOCrender(SCREEN_WIDTH, SCREEN_HEIGHT);
 	pEoc->setScene(g_scene);
-
+	pEoc->setOriginCamera(&g_Camera);
 }
 
 
@@ -115,7 +122,7 @@ void Display()
 	g_Camera.cameraControl();
 	//g_scene->render(g_bufferShader, texManager, &g_Camera);            // diffuse rendering
 	
-	pEoc->render(&g_Camera, texManager);
+	pEoc->render(texManager);
 	drawTex(pEoc->getRenderImage());
 	
 	if (drawFps ) {

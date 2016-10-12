@@ -108,6 +108,9 @@
     <ClInclude Include="src\teapot.h">
       <Filter>Header Files\scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\eocCamera.h">
+      <Filter>Source Files\render\eocRender</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera.cpp">
@@ -163,6 +166,9 @@
     </ClCompile>
     <ClCompile Include="src\edgeShader.cpp">
       <Filter>Source Files\shader\edgeShader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\eocCamera.cpp">
+      <Filter>Source Files\render\eocRender</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

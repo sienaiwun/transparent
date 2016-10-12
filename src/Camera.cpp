@@ -352,14 +352,30 @@ void Camera::Update()
 	//CalculateFrameRate();
 }
 
-void Camera::printToFile(const char * fileName)
+void Camera::moveTo(float toOrigin, float toFocus)
 {
-	using namespace std;
-	ofstream file;
-	file.open(fileName);
-	file << m_vPosition.x << " " << m_vPosition.y << " " << m_vPosition.z <<endl;
-	file << m_vView.x << " " << m_vView.y << " " << m_vView.z << endl;
-	file.close();
+	nv::vec3f focus = getCameraPos() + toFocus*getDeepND();
+	nv::vec3f newOrigin = getCameraPos() + toOrigin*getRightND();
+	setPos(newOrigin, focus);
+	
+}
+void Camera::printToFile(std::string fileName)
+{
+	if (fileName.compare("") == 0)
+	{
+
+	}
+	else
+	{
+		using namespace std;
+		ofstream file;
+		file.open(fileName.c_str());
+		file << m_vPosition.x << " " << m_vPosition.y << " " << m_vPosition.z << endl;
+		file << m_vView.x << " " << m_vView.y << " " << m_vView.z << endl;
+		file.close();
+		
+	}
+	
 	
 }
 void Camera::loadToFIle(const char * fileName)
@@ -388,6 +404,10 @@ void Camera::Look()
 	m_projMat = nv::matrix4f::frustum(m_framebbmin.x, m_framebbmax.x, m_framebbmin.y, m_framebbmax.y, 1, 1000);
 	m_mvpMat = m_projMat * m_modelView;
 
+	m_deepD = normalize(nv::vec3f(m_vView.x, m_vView.y, m_vView.z) - nv::vec3f(m_vPosition.x, m_vPosition.y, m_vPosition.z));
+	m_upD = nv::vec3f(0, 1, 0);
+	m_rightD = normalize(cross(m_deepD, m_upD));
+	m_upD = normalize(cross(m_rightD, m_deepD));
 }
 
 

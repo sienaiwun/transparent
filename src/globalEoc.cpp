@@ -12,6 +12,11 @@
 		} while(0)
 
 #include "gbuffershader.h"
+EOCrender::EOCrender()
+{
+	m_eocRightCam = EocCamera(is_Right, 5, 50);
+	m_debugSwap = false;
+}
 EOCrender::EOCrender(int w, int h) :m_height(h), m_width(w), m_pScene(NULL)
 {
 	m_renderFbo = Fbo(1, m_width, m_height);
@@ -30,23 +35,35 @@ EOCrender::EOCrender(int w, int h) :m_height(h), m_width(w), m_pScene(NULL)
 	
 
 	m_pQuad = new QuadScene();
+
+	m_eocRightCam = EocCamera(is_Right, 5, 50);
+	m_eocTopCam = EocCamera(is_Top, 5, 50);
+	m_debugSwap = false;
 	CHECK_ERRORS();
 
 }
-void EOCrender::render(Camera * pCamera, textureManager & manager)
+
+void EOCrender::render(textureManager & manager)
 {
-	
+	m_eocRightCam.Look();
+	m_eocTopCam.Look();
+	Camera * pRenderCamera;
+	if (m_debugSwap == false)
+		pRenderCamera = pOriginCam;
+	else
+		pRenderCamera = m_eocTopCam.getEocCameraP();
 	assert(m_pScene != NULL);
 	glDisable(GL_CULL_FACE);
 	m_gbufferFbo.begin();
-	m_pScene->render(m_gbufferShader, manager, pCamera);
+	m_pScene->render(m_gbufferShader, manager, pRenderCamera);
 	m_gbufferFbo.end();
 	
 
-	m_edgeShader.setCamera(pCamera);
+	m_edgeShader.setCamera(pRenderCamera);
 	m_edgeFbo.begin();
 	Geometry::drawQuad(m_edgeShader);
-//	m_pQuad->render(m_edgeShader, manager, pCamera);
 	m_edgeFbo.end();
+
+	
 	
 }

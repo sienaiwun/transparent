@@ -10,8 +10,7 @@ public:
 	{
 		m_fileName.resize(1);
 		m_fileName[0] = "./model/urban/colorUrban.obj";
-		extern Camera g_Camera;
-		g_Camera.loadToFIle("./metaData/flower.txt");
+		m_cameraFile = "./metaData/flower.txt";
 		init();
 	};
 };

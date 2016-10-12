@@ -1,6 +1,7 @@
 #ifndef _CAMERA_H
 #define _CAMERA_H
 #include<stdio.h>
+#include <string>
 #include <nvMath.h>
 // This is our basic 3D point/vector class
 class CVector3
@@ -55,6 +56,11 @@ public:
 
 	Camera(CVector3, CVector3, CVector3);
 
+	void setPos(nv::vec3f newOrigin, nv::vec3f focus)
+	{
+		m_vPosition = CVector3(newOrigin.x, newOrigin.y, newOrigin.z);
+		m_vView = CVector3(focus.x, focus.y, focus.z);
+	}
 	// These are are data access functions for our camera's private data
 	CVector3 Position() { return m_vPosition; }
 	CVector3 View()		{ return m_vView; }
@@ -98,36 +104,50 @@ public:
 	void camLook();
 	void cameraControl();
 
-	void printToFile(const char * fileName) ;
+	void printToFile(std::string fileName) ;
 	void loadToFIle(const char * fileName) ;
-	inline  float * getModelViewMat()
+	inline  float * getModelViewMat() const
 	{
 		return (float*)m_modelView.get_value();
 	}
-	inline  float * getMvpMat()
+	inline  float * getMvpMat() const
 	{
 		return (float*)m_mvpMat.get_value();
 	}
-	inline float* getInvMvp()
+	inline float* getInvMvp() const
 	{
 		return (float*)inverse(m_mvpMat).get_value();
 	}
-	inline  float * getModelViewInvMat()
+	inline  float * getModelViewInvMat() const
 	{
 		return (float*)inverse(m_modelView).get_value();
 	}
-	inline nv::vec3f getCameraPos()
+	inline nv::vec3f getCameraPos() const
 	{
 		return nv::vec3f(m_vPosition.x, m_vPosition.y, m_vPosition.z);
 	}
-	inline nv::vec2f getImageMin()
+	inline nv::vec2f getImageMin() const
 	{
 		return m_framebbmin;
 	}
-	inline nv::vec2f getImageMax()
+	inline nv::vec2f getImageMax() const
 	{
 		return m_framebbmax;
 	}
+	inline nv::vec3f getUpND() const
+	{
+		return m_upD;
+	}
+	inline nv::vec3f getDeepND() const
+	{
+		return m_deepD;
+	}
+	inline nv::vec3f getRightND() const
+	{
+		return m_rightD;
+	}
+	void moveTo(float toOrigin, float toFocus);
+	
 private:
 	// The camera's position
 	CVector3 m_vPosition;
@@ -140,6 +160,8 @@ private:
 
 	// The camera's strafe vector
 	CVector3 m_vStrafe;
+
+	nv::vec3f m_upD,m_rightD,m_deepD;
 
 	nv::matrix4f m_modelView;
 	nv::matrix4f m_mvpMat;
