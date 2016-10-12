@@ -51,7 +51,9 @@ public:
 	int getPositionSize() const;
 	int getNormalSize() const;
 	int getTexCoordSize() const;
+	static void drawQuad(glslShader &shader, bool addition , nv::vec2f beginPoint = nv::vec2f(0, 0), nv::vec2f endPoint = nv::vec2f(1, 1));
 	static void drawQuad(glslShader & shader);
+	static void  drawTriangle(nv::vec3f newOrigin,  glslShader& shader);
 	void render(glslShader & shader, textureManager & manager);
 	//
 	//compiled data access functions

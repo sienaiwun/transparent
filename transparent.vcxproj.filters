@@ -40,6 +40,18 @@
     <Filter Include="Header Files\scene">
       <UniqueIdentifier>{63891f9e-1666-4055-b3d8-afa22c9d34b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\shader\eocVolum">
+      <UniqueIdentifier>{643df440-9291-4712-ba66-5c367630ab99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\blendShader">
+      <UniqueIdentifier>{992c27c3-8571-4b17-9ba0-9c8544086189}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\shader\blendShader">
+      <UniqueIdentifier>{ac998089-bad1-4c1c-a401-60083d55cb73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\shader\showShader">
+      <UniqueIdentifier>{872b702a-1243-42c3-a3e9-90318d032ed0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\glslShader.h">
@@ -111,6 +123,18 @@
     <ClInclude Include="src\eocCamera.h">
       <Filter>Source Files\render\eocRender</Filter>
     </ClInclude>
+    <ClInclude Include="src\box.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\eocVolumn.h">
+      <Filter>Source Files\shader\eocVolum</Filter>
+    </ClInclude>
+    <ClInclude Include="src\blender.h">
+      <Filter>Source Files\shader\blendShader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\showShader.h">
+      <Filter>Source Files\shader\showShader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera.cpp">
@@ -170,6 +194,15 @@
     <ClCompile Include="src\eocCamera.cpp">
       <Filter>Source Files\render\eocRender</Filter>
     </ClCompile>
+    <ClCompile Include="src\eocVolumn.cpp">
+      <Filter>Source Files\shader\eocVolum</Filter>
+    </ClCompile>
+    <ClCompile Include="src\blender.cpp">
+      <Filter>Source Files\shader\blendShader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\showShader.cpp">
+      <Filter>Source Files\shader\showShader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\gBuffer.frag">
@@ -201,6 +234,27 @@
     </None>
     <None Include="shader\edgeDetector.frag">
       <Filter>Source Files\shader\edgeShader</Filter>
+    </None>
+    <None Include="shader\eocVolumn.frag">
+      <Filter>Source Files\shader\eocVolum</Filter>
+    </None>
+    <None Include="shader\eocVolumn.vert">
+      <Filter>Source Files\shader\eocVolum</Filter>
+    </None>
+    <None Include="shader\eocVolumn.geom">
+      <Filter>Source Files\shader\eocVolum</Filter>
+    </None>
+    <None Include="shader\blend.frag">
+      <Filter>Source Files\shader\blendShader</Filter>
+    </None>
+    <None Include="shader\blend.vert">
+      <Filter>Source Files\shader\blendShader</Filter>
+    </None>
+    <None Include="shader\showShader.frag">
+      <Filter>Source Files\shader\showShader</Filter>
+    </None>
+    <None Include="shader\showShader.vert">
+      <Filter>Source Files\shader\showShader</Filter>
     </None>
   </ItemGroup>
 </Project>

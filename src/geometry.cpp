@@ -336,22 +336,56 @@ void Geometry::adjustIndicesAndGroupMaterial(int baseVerticesID, int baseGroupMa
 		_groupMaterial[i] += baseGroupMaterialID;
 
 }
-
+void Geometry::drawQuad(glslShader& shader, bool addition, nv::vec2f beginPoint, nv::vec2f endPoint)
+{
+	if (addition)
+		glDisable(GL_DEPTH_TEST);
+	beginPoint = beginPoint * 2 - nv::vec2f(1, 1);
+	endPoint = endPoint * 2 - nv::vec2f(1, 1);
+	shader.begin();
+	glEnable(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);
+	glVertex2fv(beginPoint);
+	glVertex2f(endPoint.x, beginPoint.y);
+	glVertex2fv(endPoint);
+	glVertex2f(beginPoint.x, endPoint.y);
+	glEnd();
+	shader.end();
+	if (addition)
+		glEnable(GL_DEPTH_TEST);
+}
 void Geometry::drawQuad(glslShader& shader)
 {
 	shader.begin();
 	glEnable(GL_TEXTURE_2D);
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f);
 	glVertex2f(-1.0f, -1.0f);
-	glTexCoord2f(1.0f, 0.0f);
 	glVertex2f(1.0f, -1.0f);
-	glTexCoord2f(1.0f, 1.0f);
 	glVertex2f(1.0f, 1.0f);
-	glTexCoord2f(0.0f, 1.0f);
 	glVertex2f(-1.0f, 1.0f);
 	glEnd();
 	shader.end();
+}
+void Geometry::drawTriangle(nv::vec3f newOrigin, glslShader& shader)
+{
+	nv::vec3f point1 = nv::vec3f(-4.3123, -10.4843, -51.6457);
+	nv::vec3f point2 = nv::vec3f(-4.3123, -18.6958, -51.6457);
+
+	const float farDis = 24;
+
+	nv::vec3f vec1 = point1 + farDis* normalize(point1 - newOrigin);
+	nv::vec3f vec2 = point2 + farDis* normalize(point2 - newOrigin);
+shader.begin();
+	glBegin(GL_TRIANGLES);
+	glVertex3fv(vec1);
+	glVertex3fv(vec2);
+	glVertex3fv(point2);
+	glVertex3fv(point2);
+	glVertex3fv(point1);
+	glVertex3fv(vec1);
+	glEnd();
+	shader.end();
+
 }
 void Geometry::appendDynamicObject(Geometry& dynamicObject)
 {

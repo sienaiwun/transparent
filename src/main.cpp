@@ -10,10 +10,13 @@
 #include "time.h"
 #include "transparentRender.h"
 #include "transparentFixed.h"
-#include "globalEoc.h"
+#include "globalEoc.h".
+#include "box.h"
+#include "showShader.h"
 Timer g_time;
 Camera g_Camera;
 GbufferShader g_bufferShader;
+ShowShader g_showShader;
 Scene* g_scene;
 EOCrender * pEoc;
 textureManager texManager("");
@@ -21,35 +24,12 @@ bool drawFps = true;
 
 
 
-void drawTex(GLuint mapId)
+void drawTex(GLuint mapId, bool addition = false, nv::vec2f beginPoint = nv::vec2f(0, 0), nv::vec2f endPoint = nv::vec2f(1, 1))
 {
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, mapId);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	glBegin(GL_QUADS);
-	glTexCoord2f(0, 0);
-	glVertex2f(-1.0, -1.0);
-	glTexCoord2f(1, 0);
-	glVertex2f(1.0, -1.0);
-	glTexCoord2f(1, 1);
-	glVertex2f(1.0, 1.0);
-	glTexCoord2f(0, 1);
-	glVertex2f(-1.0, 1.0);
-	glEnd();
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
+	g_showShader.setBegin(beginPoint);
+	g_showShader.setEnd(endPoint);
+	g_showShader.setTex(mapId);
+	Geometry::drawQuad(g_showShader, addition);
 }
 
 void key(unsigned char k, int x, int y)
@@ -104,12 +84,13 @@ void Init()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	wglSwapIntervalEXT(0);
-	g_scene = new teapotScene();
+	g_scene = new boxScene();
 	g_scene->LoadCamera(&g_Camera);
 	g_bufferShader.init();
 	pEoc = new EOCrender(SCREEN_WIDTH, SCREEN_HEIGHT);
 	pEoc->setScene(g_scene);
 	pEoc->setOriginCamera(&g_Camera);
+	g_showShader.init();
 }
 
 
@@ -124,7 +105,8 @@ void Display()
 	
 	pEoc->render(texManager);
 	drawTex(pEoc->getRenderImage());
-	
+	drawTex(pEoc->getEdgeBufferP()->getTexture(0), true, nv::vec2f(0.75, 0.75));
+	drawTex(pEoc->getOccludeFbo()->getTexture(0), true, nv::vec2f(0.75, 0.50), nv::vec2f(1, 0.75));
 	if (drawFps ) {
 		static char fps_text[32];
 		float fps = g_time.getFps();
@@ -143,8 +125,7 @@ void idle()
 int main(int argc, char** argv)
 {
 	freopen("stdout.txt", "w", stdout);
-
-		freopen("stderr.txt", "w", stderr);
+	freopen("stderr.txt", "w", stderr);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);

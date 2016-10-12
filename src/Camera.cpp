@@ -27,7 +27,7 @@
 #include "macro.h"
 // We increased the speed a bit from the Camera Strafing Tutorial
 // This is how fast our camera moves
-#define kSpeed	10.0f									
+#define kSpeed	0.5f									
 
 // Our global float that stores the elapsed time between the current and last frame
 float g_FrameInterval = 0.2f;

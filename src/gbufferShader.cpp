@@ -28,6 +28,8 @@ void GbufferShader::setGeomtryIndex(int i)
 void GbufferShader::begin()
 {
 	m_loader.useShder();
+	glUniform3fv(m_objectDiffuseBinding, 1, m_diffuseColor);
+
 }
 void GbufferShader::end()
 {

@@ -46,8 +46,7 @@ void EdgeShader::bindParemeter()
 
 	setShaderTex(m_normalTexSlot, m_normalTex);
 
-	resetTexId();
-	
+
 	glUniform2f(m_res_slot, m_res.x, m_res.y);
 	glUniformMatrix4fv(m_mvpSlot, 1, GL_FALSE, m_mvp);
 	nv::matrix4f invMatrix = inverse(nv::matrix4f(m_mvp));
@@ -70,5 +69,6 @@ void EdgeShader::begin()
 }
 void EdgeShader::end()
 {
+	resetTexId();
 	m_loader.DisUse();
 }

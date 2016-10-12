@@ -3,7 +3,9 @@
 #include "edgeShader.h"
 #include "gbufferShader.h"
 #include "eocCamera.h"
+#include "eocVolumn.h"
 #include "fbo.h"
+#include "blender.h"
 #ifndef EOC_H
 #define EOC_H
 class EOCrender
@@ -16,7 +18,6 @@ public:
 	{
 		pOriginCam = pCamera;
 		m_eocRightCam.setOriginCamera(pCamera);
-		m_eocTopCam.setOriginCamera(pCamera);
 	}
 	void render(textureManager & manager);
 	inline void setScene( Scene *pScene)
@@ -27,20 +28,34 @@ public:
 	{
 		return m_renderFbo;
 	}
+	inline Fbo* getGbufferP()
+	{
+		return &m_gbufferFbo;
+	}
+	inline Fbo* getEdgeBufferP()
+	{
+		return &m_edgeFbo;
+	}
 	inline GLuint getRenderImage() 
 	{
-		return m_edgeFbo.getTexture(0);
+		return m_renderFbo.getTexture(0);
 	}
 	inline void debugSwap()
 	{
 		m_debugSwap = !m_debugSwap;
 	}
+	inline Fbo* getOccludeFbo()
+	{
+		return &m_occludedBuffer;
+	}
 private:
 	bool m_debugSwap;
-	EocCamera m_eocRightCam, m_eocTopCam;
+	EocCamera m_eocRightCam;
 	Camera * pOriginCam;
 	EdgeShader m_edgeShader;
 	GbufferShader m_gbufferShader;
+	BlendShader m_blendShader;
+	EocVolumnShader m_volumnShader;
 	 Scene * m_pScene,*m_pQuad;
 	GLuint m_width, m_height, m_k;
 	int m_total_pixel;
@@ -49,6 +64,7 @@ private:
 	Fbo m_renderFbo;
 	Fbo m_edgeFbo;
 	Fbo m_gbufferFbo;
+	Fbo m_occludedBuffer;
 	Fbo debugFbo;
 };
 #endif
