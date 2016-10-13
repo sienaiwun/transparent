@@ -40,9 +40,6 @@
     <Filter Include="Header Files\scene">
       <UniqueIdentifier>{63891f9e-1666-4055-b3d8-afa22c9d34b4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\shader\eocVolum">
-      <UniqueIdentifier>{643df440-9291-4712-ba66-5c367630ab99}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\blendShader">
       <UniqueIdentifier>{992c27c3-8571-4b17-9ba0-9c8544086189}</UniqueIdentifier>
     </Filter>
@@ -51,6 +48,9 @@
     </Filter>
     <Filter Include="Source Files\shader\showShader">
       <UniqueIdentifier>{872b702a-1243-42c3-a3e9-90318d032ed0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\shader\eocVolum">
+      <UniqueIdentifier>{643df440-9291-4712-ba66-5c367630ab99}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

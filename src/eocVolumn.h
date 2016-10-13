@@ -34,25 +34,36 @@ public:
 	{
 		m_diffuseColor = color;
 	}
+	inline void setRes(nv::vec2f res)
+	{
+		m_resolution = res;
+	}
+	inline void setEocCamera(nv::vec3f pos)
+	{
+		m_eocCameraPos = pos;
+	}
 private:
 
 	GLuint m_vmpBinding;
 	GLuint m_modelViewBinding;
 	float* m_mvp;
 	float* m_modelView;
-	GLuint m_posTexSlot;
+	GLuint m_posTexSlot,m_pEdgeSlot;
 	GLuint m_objectDiffuseBinding;
 	GLuint m_cameraPosBinding;
-	GLuint m_lightPosBinding;
+	GLuint m_reselutionSlot;
 	GLuint m_hasTex;
 	GLuint m_objectId;
 	GLuint m_reflectFactor;
+	GLuint m_eocCamSlot;
 	Fbo * m_pGbuffer;
 	Camera * m_pCamera;
 	Fbo * m_pEdgeFbo;
 	nv::vec3f m_diffuseColor;
-	nv::vec3f m_lightPos;
+	nv::vec2f c;
 	nv::vec3f m_cameraPos;
+	nv::vec2f m_resolution;
+	nv::vec3f m_eocCameraPos;
 
 
 };

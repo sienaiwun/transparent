@@ -1,20 +1,66 @@
 #version 430
 uniform mat4 MVP; // Projection * ModelView
-//in int gl_VertexID;
+
 layout (location = 0) in vec3 VertexPosition;
-layout (location = 1) in vec3 VertexNormal;
-layout (location = 2) in vec2 VertexTc;
 
 out vec3 worldPos;
-out vec3 worldNormal;
-out vec2 tc;
-//out int out_vertexId;
+noperspective out vec2 vtc;
+flat out int vIsEdge;
+
+uniform sampler2D edgeTex;
+uniform sampler2D posTex;
+uniform vec2 resolution;
+
+
+
+
+bool isVerticalEdge(vec2 tc, vec3 worldPos)
+{
+    bvec2 test= greaterThan(texture2D(edgeTex,tc).xy , vec2(0.5f,0.5f));
+	bool isEdge = all(test);
+		
+		
+	if(isEdge)
+	{
+		
+		if(length(texture2D(posTex,tc).xyz-worldPos)<0.25)
+			return true ;
+		else
+			return false;
+		
+	}
+	else 
+		return false;
+}
+
+
+bool VerticalEdgeTest(vec2 tc,vec3 worldPos)
+{
+	vec2 step = 1.0/resolution;
+   	bool c = isVerticalEdge(tc,worldPos);
+	bool l = isVerticalEdge(tc-vec2(step.x,0),worldPos);
+	bool r = isVerticalEdge(tc+vec2(step.x,0),worldPos);
+	bool t = isVerticalEdge(tc+vec2(0,step.y),worldPos);
+	bool b = isVerticalEdge(tc-vec2(0,step.y),worldPos);
+	//return c||l||r||t||b;
+
+	bool tr = isVerticalEdge(tc+vec2(step.x,step.y),worldPos);
+	bool bl = isVerticalEdge(tc-vec2(step.x,step.y),worldPos);
+	bool tl = isVerticalEdge(tc+vec2(step.x,-step.y),worldPos);
+	bool br = isVerticalEdge(tc+vec2(-step.x,step.y),worldPos);
+
+	return c||l||r||t||b||tr||bl||tl||br;
+}
+
 void main()
 {
 	worldPos = VertexPosition;
-	worldNormal = VertexNormal;
-	tc = vec2(VertexTc.x,VertexTc.y);
-	gl_Position = MVP * vec4(VertexPosition,1.0);
+	vec4 temp = MVP * vec4(VertexPosition,1.0);
+	gl_Position = temp;
+	vtc = temp.xy/temp.w *0.5+0.5;
 	
-	tc = gl_Position.xy/gl_Position.w *0.5+0.5;
+	if(VerticalEdgeTest(vtc,VertexPosition))
+		vIsEdge = 1;
+	else
+		vIsEdge = 0;
 }

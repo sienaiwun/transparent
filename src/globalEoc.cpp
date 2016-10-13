@@ -33,8 +33,7 @@ EOCrender::EOCrender(int w, int h) :m_height(h), m_width(w), m_pScene(NULL)
 	m_gbufferShader.init();
 
 	m_volumnShader.init();
-	m_volumnShader.setEdgeFbo(&m_edgeFbo);
-	m_volumnShader.setGbuffer(&m_gbufferFbo);
+	m_volumnShader.setRes(nv::vec2f(m_width, m_height));
 	
 	
 	m_edgeShader.setGbuffer(&m_gbufferFbo);
@@ -43,10 +42,9 @@ EOCrender::EOCrender(int w, int h) :m_height(h), m_width(w), m_pScene(NULL)
 	m_blendShader.init();
 	
 	m_pQuad = new QuadScene();
-
 	m_eocRightCam = EocCamera(is_Right, 5, 50);
 	m_debugSwap = false;
-	CHECK_ERRORS();
+	 
 
 }
 static bool once = true;;
@@ -55,8 +53,9 @@ void EOCrender::render(textureManager & manager)
 	if (once)
 	{
 		m_eocRightCam.Look();
-		once = false;
+		//once = false;
 	}
+	glDisable(GL_CULL_FACE);
 	Camera * pRenderCamera;
 	if (m_debugSwap == false)
 		pRenderCamera = pOriginCam;
@@ -68,24 +67,34 @@ void EOCrender::render(textureManager & manager)
 	m_gbufferFbo.begin();
 	m_gbufferShader.setDiffuse(nv::vec3f(1, 0, 0));
 	m_pScene->render(m_gbufferShader, manager, pRenderCamera);
+	//m_gbufferFbo.SaveBMP("color.bmp",0);
 	m_gbufferFbo.end();
 
 	
 	m_edgeShader.setCamera(pRenderCamera);
 	m_edgeFbo.begin();
 	Geometry::drawQuad(m_edgeShader);
+	//m_edgeFbo.SaveBMP("edge.bmp", 0);
 	m_edgeFbo.end();
 	
-	m_occludedBuffer.begin();
+	 
 	m_volumnShader.setCamera(pOriginCam);
+	m_volumnShader.setGbuffer(&m_gbufferFbo);
 	m_volumnShader.setDiffuse(nv::vec3f(1, 0, 0));
-	Geometry::drawTriangle(m_eocRightCam.getEocCameraP()->getCameraPos(), m_volumnShader);
+	m_volumnShader.setEdgeFbo(&m_edgeFbo);
+	m_volumnShader.setEocCamera(m_eocRightCam.getEocCameraP()->getCameraPos());
+	m_occludedBuffer.begin();
+	 
+	//Geometry::drawTriangle(m_eocRightCam.getEocCameraP()->getCameraPos(), m_volumnShader);
+	m_pScene->render(m_volumnShader, manager, pRenderCamera);
+	//m_occludedBuffer.SaveBMP("test.bmp",0);
+	//m_occludedBuffer.debugPixel(0, 718, 826);
 	m_occludedBuffer.end();
 	
-	
-	
+	 
 	m_blendShader.setBuffer1(&m_gbufferFbo);
 	m_blendShader.setBuffer2(&m_occludedBuffer);
+	 
 	m_renderFbo.begin();
 	Geometry::drawQuad(m_blendShader);
 	m_renderFbo.end();

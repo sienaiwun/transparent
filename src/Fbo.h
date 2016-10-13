@@ -92,7 +92,7 @@ public:
 	//¾²Ì¬º¯Êý ´æ´¢bmp
 	static void SaveBMP(const char *fileName, BYTE *buf, UINT width, UINT height);
 	static void SaveBMP(GLuint texId, const char * fileName,UINT width,UINT height);
-	void debugPixel(int id, int x,int y,int scale = 1);
+	nv::vec4f debugPixel(int id, int x,int y,int scale = 1);
 	void SaveBMP(const char *fileName, int id);
 
 	void SaveBuffToBMP(const char *fileName, int id);

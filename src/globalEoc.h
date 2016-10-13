@@ -24,10 +24,6 @@ public:
 	{
 		m_pScene = pScene;
 	}
-	inline Fbo& getFbo() 
-	{
-		return m_renderFbo;
-	}
 	inline Fbo* getGbufferP()
 	{
 		return &m_gbufferFbo;
@@ -36,9 +32,9 @@ public:
 	{
 		return &m_edgeFbo;
 	}
-	inline GLuint getRenderImage() 
+	inline Fbo* getRenderFbo() 
 	{
-		return m_renderFbo.getTexture(0);
+		return &m_renderFbo;
 	}
 	inline void debugSwap()
 	{

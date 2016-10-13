@@ -104,9 +104,11 @@ void Display()
 	//g_scene->render(g_bufferShader, texManager, &g_Camera);            // diffuse rendering
 	
 	pEoc->render(texManager);
-	drawTex(pEoc->getRenderImage());
+	drawTex(pEoc->getRenderFbo()->getTexture(0));
 	drawTex(pEoc->getEdgeBufferP()->getTexture(0), true, nv::vec2f(0.75, 0.75));
 	drawTex(pEoc->getOccludeFbo()->getTexture(0), true, nv::vec2f(0.75, 0.50), nv::vec2f(1, 0.75));
+	drawTex(pEoc->getGbufferP()->getTexture(0), true, nv::vec2f(0.75, 0.25), nv::vec2f(1, 0.55));
+
 	if (drawFps ) {
 		static char fps_text[32];
 		float fps = g_time.getFps();

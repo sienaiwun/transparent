@@ -368,23 +368,26 @@ void Geometry::drawQuad(glslShader& shader)
 }
 void Geometry::drawTriangle(nv::vec3f newOrigin, glslShader& shader)
 {
+	CHECK_ERRORS();
 	nv::vec3f point1 = nv::vec3f(-4.3123, -10.4843, -51.6457);
 	nv::vec3f point2 = nv::vec3f(-4.3123, -18.6958, -51.6457);
 
-	const float farDis = 24;
+	const float farDis = 150;
 
 	nv::vec3f vec1 = point1 + farDis* normalize(point1 - newOrigin);
 	nv::vec3f vec2 = point2 + farDis* normalize(point2 - newOrigin);
-shader.begin();
-	glBegin(GL_TRIANGLES);
+	CHECK_ERRORS();
+	shader.begin();
+	CHECK_ERRORS();
+	glBegin(GL_TRIANGLE_STRIP);
 	glVertex3fv(vec1);
 	glVertex3fv(vec2);
-	glVertex3fv(point2);
-	glVertex3fv(point2);
 	glVertex3fv(point1);
-	glVertex3fv(vec1);
+	glVertex3fv(point2);
 	glEnd();
+	CHECK_ERRORS();
 	shader.end();
+	CHECK_ERRORS();
 
 }
 void Geometry::appendDynamicObject(Geometry& dynamicObject)
