@@ -19,18 +19,19 @@ bool isVerticalEdge(vec2 tc, vec3 worldPos)
     bvec2 test= greaterThan(texture2D(edgeTex,tc).xy , vec2(0.5f,0.5f));
 	bool isEdge = all(test);
 		
-		
+	
 	if(isEdge)
 	{
 		
-		if(length(texture2D(posTex,tc).xyz-worldPos)<0.25)
+		//if(length(texture2D(posTex,tc).xyz-worldPos)<0.25)
 			return true ;
-		else
-			return false;
+		//else
+		//	return false;
 		
 	}
 	else 
 		return false;
+		
 }
 
 

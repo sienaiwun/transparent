@@ -106,6 +106,10 @@ public:
 
 	void printToFile(std::string fileName) ;
 	void loadToFIle(const char * fileName) ;
+	inline float * getProjection() const
+	{
+		return (float*)m_projMat.get_value();
+	}
 	inline  float * getModelViewMat() const
 	{
 		return (float*)m_modelView.get_value();

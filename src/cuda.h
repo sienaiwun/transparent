@@ -19,7 +19,6 @@ enum cudaTexType
 	occluderbuffer_t,
 	edgebuffer_t,
 	color_t,
-	
 };
 
 

@@ -52,6 +52,9 @@
     <Filter Include="Source Files\render\cuda">
       <UniqueIdentifier>{221214d8-9ff0-4b2d-bd92-5be281f5424d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\shader\newEdgeShader">
+      <UniqueIdentifier>{90497439-9432-4c9b-9ecc-fd658a45b07b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\glslShader.h">
@@ -86,9 +89,6 @@
     </ClInclude>
     <ClInclude Include="src\glm.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\gbufferShader.h">
-      <Filter>Source Files\shader\diffuseShader</Filter>
     </ClInclude>
     <ClInclude Include="src\transparentShader.h">
       <Filter>Source Files\shader\tranparentShader</Filter>
@@ -140,6 +140,12 @@
     </ClInclude>
     <ClInclude Include="src\cuda.h">
       <Filter>Source Files\render\cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="src\newEdge.h">
+      <Filter>Source Files\shader\newEdgeShader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gbufferShader.h">
+      <Filter>Source Files\shader\diffuseShader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -215,6 +221,9 @@
     <ClCompile Include="src\cuda.cpp">
       <Filter>Source Files\render\cuda</Filter>
     </ClCompile>
+    <ClCompile Include="src\newEdge.cpp">
+      <Filter>Source Files\shader\newEdgeShader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\gBuffer.frag">
@@ -270,6 +279,12 @@
     </None>
     <None Include="shader\rowCounter_list.glsl">
       <Filter>Source Files\shader\computerShader</Filter>
+    </None>
+    <None Include="shader\newEdge.frag">
+      <Filter>Source Files\shader\newEdgeShader</Filter>
+    </None>
+    <None Include="shader\newEdge.vert">
+      <Filter>Source Files\shader\newEdgeShader</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

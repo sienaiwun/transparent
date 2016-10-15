@@ -61,7 +61,6 @@ void EOCrender::render(textureManager & manager)
 		m_eocRightCam.Look();
 		//once = false;
 	}
-	glDisable(GL_CULL_FACE);
 	Camera * pRenderCamera;
 	if (m_debugSwap == false)
 		pRenderCamera = pOriginCam;
@@ -69,16 +68,21 @@ void EOCrender::render(textureManager & manager)
 		pRenderCamera = m_eocRightCam.getEocCameraP();
 
 	assert(m_pScene != NULL);
-	glDisable(GL_CULL_FACE);
 	m_gbufferFbo.begin();
 	m_gbufferShader.setDiffuse(nv::vec3f(1, 0, 0));
 	m_pScene->render(m_gbufferShader, manager, pRenderCamera);
+	//m_gbufferFbo.SaveBMP("gbuffer.bmp", 0);
 	m_gbufferFbo.end();
 
-	
+	//glCullFace(GL_BACK);
+	//glEnable(GL_CULL_FACE);
 	m_edgeShader.setCamera(pRenderCamera);
 	m_edgeFbo.begin();
-	Geometry::drawQuad(m_edgeShader);
+	m_pScene->render(m_edgeShader, manager, pRenderCamera);
+	//Geometry::drawQuad(m_edgeShader);
+	//m_edgeFbo.SaveBMP("edge.bmp", 0);
+	//m_edgeFbo.debugPixel(0, 512, 512);
+	//m_edgeFbo.debugPixel(0,353, 618);
 	m_edgeFbo.end();
 	
 	m_volumnShader.setCamera(pOriginCam);
@@ -96,10 +100,12 @@ void EOCrender::render(textureManager & manager)
 
 
 	m_blendShader.setBuffer1(&m_gbufferFbo);
-	m_blendShader.setBuffer2(&m_occludedBuffer);
+	m_blendShader.setBuffer2(&m_edgeFbo);
 	 
 	m_renderFbo.begin();
 	Geometry::drawQuad(m_blendShader);
+//	m_renderFbo.SaveBMP("test.bmp", 0);
+
 	m_renderFbo.end();
 	
 	pCounter->render();

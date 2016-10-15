@@ -1,6 +1,7 @@
 #include "scene.h"
 #include "textureManager.h"
 #include "edgeShader.h"
+#include "newEdge.h"
 #include "gbufferShader.h"
 #include "eocCamera.h"
 #include "eocVolumn.h"
@@ -45,7 +46,7 @@ public:
 	{
 		return &m_occludedBuffer;
 	}
-	inline GLuint getTex()  
+	inline GLuint getCudaTex()  
 	{
 		return pCounter->getTex();
 	}
@@ -53,7 +54,7 @@ private:
 	bool m_debugSwap;
 	EocCamera m_eocRightCam;
 	Camera * pOriginCam;
-	EdgeShader m_edgeShader;
+	NewEdgeShader m_edgeShader;
 	GbufferShader m_gbufferShader;
 	BlendShader m_blendShader;
 	EocVolumnShader m_volumnShader;
