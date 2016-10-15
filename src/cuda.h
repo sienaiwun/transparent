@@ -12,8 +12,8 @@
 //#include <curand_kernel.h>
 #ifndef CUDA_H
 #define  CUDA_H
-#define DEBUG
-
+//#define DEBUG
+#define ROWLARGER (1.2)
 enum cudaTexType
 {
 	occluderbuffer_t,
@@ -92,7 +92,7 @@ enum cudaPboType
 	float2_t,
 	test_t,
 	diff_normal_t,
-	unit_4,
+	unit_3,
 #ifdef NOISEMAP
 	refract_t,
 
@@ -145,6 +145,6 @@ private:
 extern "C" void cudaRelateTex(CudaTexResourse * pResouce);
 extern "C" void cudaRelateArray(CudaPboResource * pResouce);
 extern "C" void countRow(int width, int height);
-extern void cudaInit(int height, int k);
+extern void cudaInit(int height,int width, int k,int rowLarger);
 
 #endif

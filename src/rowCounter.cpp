@@ -38,12 +38,12 @@ void RowCounter::init()
 	m_occluderCudaTex->init();
 
 	m_initArray = new CudaPboResource();
-	m_initArray->set(1, m_height, unit_4);
+	m_initArray->set(1, m_height, unit_3);
 	m_initArray->init();
 	m_OutTex = new CudaPboResource();
-	m_OutTex->set(1.5*m_width, m_height, float4_t);
+	m_OutTex->set(ROWLARGER*m_width, m_height, float4_t);
 	m_OutTex->init();
-	cudaInit(m_height, m_k);
+	cudaInit(m_height,m_width, m_k, ROWLARGER);
 
 
 }
@@ -68,6 +68,9 @@ void RowCounter::render()
 	m_edgeCudaTex->unmap();
 	m_occluderCudaTex->unmap();
 	m_initArray->unMap();
+#ifdef DEBUG
+	m_initArray->generateTex();
+#endif
 	m_OutTex->unMap();
 	m_OutTex->generateTex();
 	m_getTex = m_OutTex->getTexture();

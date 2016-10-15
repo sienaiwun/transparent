@@ -5,13 +5,6 @@ texture<float4, 2, cudaReadModeElementType> cudaOccuderTex;
 texture<float4, 2, cudaReadModeElementType> cudaColorTex;
 cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc(32, 32, 32, 32, cudaChannelFormatKindFloat);
 
-__device__ bool isVolume(float2 uv, int *state)
-{
-	if (uv.x > 230 && uv.x < 300)
-		return true;
-	float4 value = tex2D(cudaOccuderTex, uv.x, uv.y);
-	return value.x > 0.5;
-}
 typedef enum {
 	isVolumn,
 	notVolumn,
@@ -20,12 +13,12 @@ class ListNote
 {
 public:
 
-	unsigned int beginIndex, endIndex, nextPt;
+	unsigned int nextPt,beginIndex, endIndex;
 };
 
-uint4 *cuda_PBO_Buffer;
+uint3 *cuda_PBO_Buffer;
 
-__device__ uint4* d_cudaPboBuffer;
+__device__ uint3* d_cudaPboBuffer;
 float4 *cuda_TexturePbo_buffer;
 __device__ float4* d_cudaTexture;
 __device__ int imageWidth, imageHeight, d_outTextureWidth, d_outTextureHeigh;
@@ -37,6 +30,18 @@ class List
 {
 	
 };
+
+__device__ bool isVolume(float2 uv, int *state)
+{
+	//if (uv.x > 230 && uv.x < 300)
+	//	return true;
+	float4 value = tex2D(cudaOccuderTex, uv.x, uv.y);
+	return value.x > 0.5;
+}
+__device__ float2 toUv(int x, int y)
+{
+	return make_float2(x + 0.5, y + 0.5);
+}
 __global__ void countRowKernel(int kernelWidth, int kernelHeight)
 {
 	int y = __umul24(blockIdx.y, blockDim.y) + threadIdx.y;
@@ -52,7 +57,7 @@ __global__ void countRowKernel(int kernelWidth, int kernelHeight)
 	int listIndex;
 	for (int x = 0; x < imageWidth;x++)
 	{
-		float2 currentUv = make_float2(x + 0.5, y + 0.5);
+		float2 currentUv = toUv(x, y);
 		if (isVolume(currentUv, &state) && etype == notVolumn)
 		{
 			//printf("insert :%d\n", x);
@@ -80,11 +85,67 @@ __global__ void countRowKernel(int kernelWidth, int kernelHeight)
 
 	}
 }
+__device__ void FillVolumn(int beginX, int endX, int y)
+{
+	int top = min(endX, d_outTextureWidth);
+	//printf("volumn begin:%d,end:%d,top:%d\n",beginX,endX,top);
+	for (int x = beginX; x < top; x++)
+	{
+		int index = y*d_outTextureWidth + x;
+		d_cudaTexture[index] =make_float4(1,0,0,1);
+		//printf("fillPixel(%d,%d),index%d  (%f,%f)\t", x, y, index, uvx, beginUv.y);
+
+	}
+}
+__device__ void FillSpan(int beginX, int endX, int y,float2 beginUv,float2 endUv)
+{
+	int top = min(endX, d_outTextureWidth);
+	//printf("tx: begin:%d,end:%d,top:%d,(%f,%f)\n",beginX,endX,top,beginUv.x,endUv.x);
+	for (int x = beginX; x < top; x++)
+	{
+		int index = y*d_outTextureWidth+x;
+		float uvx = beginUv.x + (endUv.x - beginUv.x) / (top - 1)*x;
+		d_cudaTexture[index] = tex2D(cudaColorTex, uvx, beginUv.y);
+		//printf("fillPixel(%d,%d),index%d  (%f,%f)\t", x, y, index, uvx, beginUv.y);
+
+	}
+}
 __global__ void renderToTexutre(int kernelWidth, int kernelHeight)
 {
 	int y = __umul24(blockIdx.y, blockDim.y) + threadIdx.y;
 	if (y > kernelHeight)
 		return;
+	int listIndex = y;
+	int rowLength = imageWidth;
+	ListNote currentNote =* ((ListNote*)&d_cudaPboBuffer[listIndex]);
+	//if (y != 599)
+	//	return;
+	int texEnd =0;
+	int texBegin = 0;
+	int fillBegin = 0;
+	int fillEnd = 0;
+	int acuumPixel =0,span =0;
+	//("begin:%d,end%d,index:%d\n", currentNote.beginIndex, currentNote.endIndex, currentNote.nextPt);
+	//printf("init:%d\n", d_cudaPboBuffer[listIndex].x);
+	while (currentNote.nextPt != 0)
+	{
+		currentNote = d_listBuffer[currentNote.nextPt];
+		texEnd = currentNote.endIndex;
+		span = currentNote.endIndex - currentNote.beginIndex;
+		fillBegin = texBegin + acuumPixel;
+		fillEnd = texEnd + acuumPixel;
+		FillSpan(fillBegin, fillEnd, y, toUv(texBegin, y), toUv(texEnd, y));
+		FillVolumn(fillEnd, fillEnd+span, y);
+		
+		acuumPixel += span;
+		texBegin = currentNote.endIndex;
+		
+	}
+	fillBegin = texBegin + acuumPixel;
+	//printf("final:(%d,%d) u(%f,%f)\n", fillBegin, imageWidth + span, toUv(texBegin, y).x, toUv(imageWidth - 1, y).x);
+
+	FillSpan(fillBegin, imageWidth + span, y, toUv(texBegin, y), toUv(imageWidth - 1, y));
+
 	
 }
 ListNote *device_data = NULL;
@@ -92,7 +153,7 @@ int atomBuffer = 0;
 #ifdef DEBUG
 	ListNote *host_data = NULL;
 #endif
-extern void cudaInit(int height, int k)
+extern void cudaInit(int height, int width,int k,int rowLarger)
 {
 	checkCudaErrors(cudaMalloc(&device_data, height*k*sizeof(ListNote)));
 	
@@ -100,6 +161,7 @@ extern void cudaInit(int height, int k)
 	
 	checkCudaErrors(cudaMemcpyToSymbol(d_atomic, &atomBuffer, sizeof(int)));
 	checkCudaErrors(cudaMemset(device_data,0, height*k*sizeof(ListNote)));  
+	//checkCudaErrors(cudaMemset(cuda_TexturePbo_buffer, 0, width* height*rowLarger*sizeof(float4)));
 #ifdef DEBUG
 	checkCudaErrors(cudaMallocHost(&host_data, height*k*sizeof(ListNote)));
 #endif
@@ -119,7 +181,8 @@ extern "C" void countRow(int width, int height)
 	cudaEventRecord(begin_t, 0);
 
 	checkCudaErrors(cudaMemcpyToSymbol(d_atomic, &atomBuffer, sizeof(int)));
-	checkCudaErrors(cudaMemset(cuda_PBO_Buffer, 0, height*sizeof(uint4)));
+	checkCudaErrors(cudaMemset(cuda_PBO_Buffer, 0, height*sizeof(uint3)));
+	checkCudaErrors(cudaMemset(cuda_TexturePbo_buffer, 0, ROWLARGER*width*height*sizeof(float4)));
 
 	dim3 blockSize(1, 16, 1);
 	dim3 gridSize(1, height / blockSize.y, 1);
@@ -128,6 +191,8 @@ extern "C" void countRow(int width, int height)
 	cudaEventSynchronize(end_t);
 	float costtime;
 	checkCudaErrors(cudaEventElapsedTime(&costtime, begin_t, end_t));
+
+	renderToTexutre << <gridSize, blockSize >> >(1, height);
 
 	checkCudaErrors(cudaEventDestroy(begin_t));
 	checkCudaErrors(cudaEventDestroy(end_t));
@@ -178,10 +243,10 @@ extern "C" void cudaRelateArray(CudaPboResource * pResource)
 	cudaGraphicsResource ** pCudaTex = pResource->getResPoint();
 	int w = pResource->getWidth();
 	int h = pResource->getHeight();
-	if (unit_4 == pResource->getType())
+	if (unit_3 == pResource->getType())
 	{
 		checkCudaErrors(cudaGraphicsResourceGetMappedPointer((void**)&cuda_PBO_Buffer, &numBytes, *pCudaTex));
-		checkCudaErrors(cudaMemcpyToSymbol(d_cudaPboBuffer, &cuda_PBO_Buffer, sizeof(uint4*)));
+		checkCudaErrors(cudaMemcpyToSymbol(d_cudaPboBuffer, &cuda_PBO_Buffer, sizeof(uint3*)));
 	}
 	else if (float4_t == pResource->getType())
 	{

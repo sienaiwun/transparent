@@ -55,9 +55,9 @@ void CudaPboResource::initPbo()
 		glBufferData(GL_PIXEL_UNPACK_BUFFER, m_width*m_height*sizeof(float2), 0, GL_STREAM_READ);
 
 	}
-	else if (m_type == unit_4)
+	else if (m_type == unit_3)
 	{
-		glBufferData(GL_PIXEL_UNPACK_BUFFER, m_width*m_height*sizeof(uint4), 0, GL_STREAM_READ);
+		glBufferData(GL_PIXEL_UNPACK_BUFFER, m_width*m_height*sizeof(uint3), 0, GL_STREAM_READ);
 	}
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
@@ -78,35 +78,37 @@ void CudaPboResource::initTex()
 }
 void CudaPboResource::generateTex()
 {
-	if (m_type == unit_4)
+	if (m_type == unit_3)
 	{
 		glPushAttrib(GL_PIXEL_MODE_BIT);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pbo);
 		glBindTexture(GL_TEXTURE_2D, m_texture);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_RGBA, GL_UNSIGNED_INT, 0);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_RGB, GL_UNSIGNED_INT, 0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 		glPopAttrib();
 
 #ifdef DEBUG
+		
 		glEnable(GL_TEXTURE_2D);
 		int *pTexture = NULL;
-		pTexture = new int[m_width*m_height * 4];
-		memset(pTexture, 0, m_width*m_height * 4 * sizeof(int));
+		pTexture = new int[m_width*m_height * 3];
+		memset(pTexture, 0, m_width*m_height * 3* sizeof(int));
 
 
 		glBindTexture(GL_TEXTURE_2D, m_texture);//TexPosId   PboTex
 
 
-		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_INT, pTexture);
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_INT, pTexture);
 
 		for (int y = 0; y < m_height; y++)
 		{
-			printf("%d index:%d\t", y, pTexture[4 * y]);
+			printf("%d index:%d\t", y, pTexture[3 * y]);
 		}
+		glBindTexture(GL_TEXTURE_2D, 0);//TexPosId   PboTex*/
 #endif
-		glBindTexture(GL_TEXTURE_2D, 0);//TexPosId   PboTex
+		
 	}
 	else if (float4_t == m_type)
 	{
