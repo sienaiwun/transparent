@@ -36,20 +36,21 @@ static void genComputeProg(GLuint &csPro, const char *cs_shaderFile)
 	// Creating the compute shader, and the program object containing the shader
 	csPro = glCreateProgram();
 	GLuint cs = glCreateShader(GL_COMPUTE_SHADER);
-
+	/*
 	const char *csSrc = readCSShaderFile(cs_shaderFile);
 	if (csSrc == NULL)
 	{
 		printf("failed to read %s\n", cs_shaderFile);
 		exit(EXIT_FAILURE);
 	}
-
+	*/
 	// In order to write to a texture, we have to introduce it as image2D.
 	// local_size_x/y/z layout variables define the work group size.
 	// gl_GlobalInvocationID is a uvec3 variable giving the global ID of the thread,
 	// gl_LocalInvocationID is the local index within the work group, and
 	// gl_WorkGroupID is the work group's index
-	/*const char *csSrc[] = {
+	
+	const char *csSrc[] = {
 	"#version 430\n",
 	"uniform float roll;\
 	uniform image2D destTex;\
@@ -60,7 +61,7 @@ static void genComputeProg(GLuint &csPro, const char *cs_shaderFile)
 	float globalCoef = sin(float(gl_WorkGroupID.x+gl_WorkGroupID.y)*0.1 + roll)*0.5;\
 	imageStore(destTex, storePos, vec4(1.0-globalCoef*localCoef, 0.0, 0.0, 0.0));\
 	}"
-	};*/
+	};
 
 	glShaderSource(cs, 1, (const GLchar**)&csSrc, NULL);
 	glCompileShader(cs);
@@ -102,6 +103,7 @@ static GLuint getAtomicCounter(GLuint buffer)
 #include "gbuffershader.h"
 OITrender::OITrender(int w, int h, int k) :m_height(h), m_width(w), m_k(k), m_pScene(NULL)
 {
+
 	m_renderFbo = Fbo(1, m_width, m_height);
 	m_renderFbo.init();
 	/*

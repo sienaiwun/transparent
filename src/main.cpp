@@ -21,7 +21,7 @@ Scene* g_scene;
 EOCrender * pEoc;
 textureManager texManager("");
 bool drawFps = true;
-
+OITrender *g_render;
 
 
 void drawTex(GLuint mapId, bool addition = false, nv::vec2f beginPoint = nv::vec2f(0, 0), nv::vec2f endPoint = nv::vec2f(1, 1))
@@ -87,10 +87,13 @@ void Init()
 	g_scene = new boxScene();
 	g_scene->LoadCamera(&g_Camera);
 	g_bufferShader.init();
+	//g_render = new OITrender(SCREEN_WIDTH, SCREEN_HEIGHT, 20);
+
 	pEoc = new EOCrender(SCREEN_WIDTH, SCREEN_HEIGHT);
 	pEoc->setScene(g_scene);
 	pEoc->setOriginCamera(&g_Camera);
 	g_showShader.init();
+	
 }
 
 
@@ -104,7 +107,7 @@ void Display()
 	//g_scene->render(g_bufferShader, texManager, &g_Camera);            // diffuse rendering
 	
 	pEoc->render(texManager);
-	drawTex(pEoc->getRenderFbo()->getTexture(0));
+	drawTex(pEoc->getTex());
 	drawTex(pEoc->getEdgeBufferP()->getTexture(0), true, nv::vec2f(0.75, 0.75));
 	drawTex(pEoc->getOccludeFbo()->getTexture(0), true, nv::vec2f(0.75, 0.50), nv::vec2f(1, 0.75));
 	drawTex(pEoc->getGbufferP()->getTexture(0), true, nv::vec2f(0.75, 0.25), nv::vec2f(1, 0.55));

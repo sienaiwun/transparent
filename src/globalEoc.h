@@ -6,6 +6,7 @@
 #include "eocVolumn.h"
 #include "fbo.h"
 #include "blender.h"
+#include "rowCounter.h"
 #ifndef EOC_H
 #define EOC_H
 class EOCrender
@@ -44,6 +45,10 @@ public:
 	{
 		return &m_occludedBuffer;
 	}
+	inline GLuint getTex()  
+	{
+		return pCounter->getTex();
+	}
 private:
 	bool m_debugSwap;
 	EocCamera m_eocRightCam;
@@ -62,5 +67,7 @@ private:
 	Fbo m_gbufferFbo;
 	Fbo m_occludedBuffer;
 	Fbo debugFbo;
+
+	RowCounter * pCounter;
 };
 #endif

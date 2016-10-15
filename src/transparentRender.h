@@ -29,6 +29,7 @@ private:
 	int m_total_pixel;
 	GLuint m_head_pointer_texture, m_head_pointer_initializer, m_atomic_counter_buffer, m_fragment_storage_buffer, m_linked_list_texture, m_computerShader, dispatch_buffer;
 	GLuint *m_data;
+	GLuint m_test;
 	Fbo m_renderFbo;
 };
 #endif
