@@ -50,6 +50,10 @@ public:
 	{
 		return pCounter->getTex();
 	}
+	inline EocCamera* getEocCamera()
+	{
+		return &m_eocRightCam;
+	}
 private:
 	bool m_debugSwap;
 	EocCamera m_eocRightCam;

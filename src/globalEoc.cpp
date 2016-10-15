@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "geometry.h"
 #include "quad.h"
+#define GL_CONSERVATIVE_RASTERIZATION_NV 0x9346
 #define CHECK_ERRORS()         \
 	do {                         \
 	GLenum err = glGetError(); \
@@ -42,7 +43,7 @@ EOCrender::EOCrender(int w, int h) :m_height(h), m_width(w), m_pScene(NULL)
 	m_blendShader.init();
 	
 	m_pQuad = new QuadScene();
-	m_eocRightCam = EocCamera(is_Right, 5, 50);
+	m_eocRightCam = EocCamera(is_Right, 0.1, 50);
 	m_debugSwap = false;
 	
 	pCounter = new RowCounter(w, h);
@@ -75,7 +76,7 @@ void EOCrender::render(textureManager & manager)
 	m_gbufferFbo.end();
 
 	//glCullFace(GL_BACK);
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CONSERVATIVE_RASTERIZATION_NV);
 	m_edgeShader.setCamera(pRenderCamera);
 	m_edgeFbo.begin();
 	m_pScene->render(m_edgeShader, manager, pRenderCamera);
@@ -84,6 +85,7 @@ void EOCrender::render(textureManager & manager)
 	//m_edgeFbo.debugPixel(0, 512, 512);
 	//m_edgeFbo.debugPixel(0,353, 618);
 	m_edgeFbo.end();
+	glDisable(GL_CONSERVATIVE_RASTERIZATION_NV);
 	
 	m_volumnShader.setCamera(pOriginCam);
 	m_volumnShader.setGbuffer(&m_gbufferFbo);

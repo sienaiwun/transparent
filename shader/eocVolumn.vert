@@ -4,8 +4,6 @@ uniform mat4 MVP; // Projection * ModelView
 layout (location = 0) in vec3 VertexPosition;
 
 out vec3 worldPos;
-noperspective out vec2 vtc;
-flat out int vIsEdge;
 
 uniform sampler2D edgeTex;
 uniform sampler2D posTex;
@@ -37,6 +35,7 @@ bool isVerticalEdge(vec2 tc, vec3 worldPos)
 
 bool VerticalEdgeTest(vec2 tc,vec3 worldPos)
 {
+
 	vec2 step = 1.0/resolution;
    	bool c = isVerticalEdge(tc,worldPos);
 	bool l = isVerticalEdge(tc-vec2(step.x,0),worldPos);
@@ -56,12 +55,6 @@ bool VerticalEdgeTest(vec2 tc,vec3 worldPos)
 void main()
 {
 	worldPos = VertexPosition;
-	vec4 temp = MVP * vec4(VertexPosition,1.0);
-	gl_Position = temp;
-	vtc = temp.xy/temp.w *0.5+0.5;
+	gl_Position =  MVP * vec4(VertexPosition,1.0);
 	
-	if(VerticalEdgeTest(vtc,VertexPosition))
-		vIsEdge = 1;
-	else
-		vIsEdge = 0;
 }

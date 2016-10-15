@@ -13,7 +13,7 @@
 #ifndef CUDA_H
 #define  CUDA_H
 //#define DEBUG
-#define ROWLARGER (1.2)
+#define ROWLARGER (1.5)
 enum cudaTexType
 {
 	occluderbuffer_t,

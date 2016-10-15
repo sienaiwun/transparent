@@ -25,6 +25,11 @@ public:
 	{
 		return &m_eocCamera;
 	}
+	inline void addToOrigin(const float dis)
+	{
+		m_toOriginDis += dis;
+		m_toOriginDis = std::max<float>(0.0, m_toOriginDis);
+	}
 	void Look();
 private:
 	Camera * m_pOriginCamera;

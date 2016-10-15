@@ -40,7 +40,7 @@ void main()
 	tc = vec2(VertexTc.x,VertexTc.y);
 	gl_Position = MVP * vec4(VertexPosition ,1.0);
 	gl_Position/=gl_Position.w;
-	gl_Position.xy += offset(VertexPosition,worldNormal)*1.0/1024*2;
+	gl_Position.xy += offset(VertexPosition,worldNormal)*1.0/1024*1;
 	//vec3 norm   =  (mat3(modeViewInv)* worldNormal);
 	//vec2 offset = TransformViewToProjection(norm.xy);
 	//gl_Position.xy += offset * gl_Position.z * _Outline;

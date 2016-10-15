@@ -74,14 +74,12 @@ void main()
 		;
 	else
 		discard;
-		
-		
 	if(length(orginPos-worldPos)>8.004)
 		;
 	else
 		discard;
 		
-	color0.xyzw = firstDisconect(ndc,worldPos);
+	color0.xyzw = firstDisconect(ndc,worldPos);  //tc get by mvp
 	color0.x = 1;
 	color0.z = 1;
 }

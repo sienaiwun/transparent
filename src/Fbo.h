@@ -107,5 +107,4 @@ public:
 	static void mipMaptoSceen(GLuint texid,int widht,int height);
 	//glm::vec2 ComputError(int);
 };
-
 #endif

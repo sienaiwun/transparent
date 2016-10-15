@@ -64,7 +64,7 @@ __global__ void countRowKernel(int kernelWidth, int kernelHeight)
 			listIndex = atomicAdd(&d_atomic, 1);
 			atomicExch(nextPtr, listIndex);// write listIndex to next slot
 			d_listBuffer[listIndex].beginIndex = x;
-			d_listBuffer[listIndex].endIndex = x + 1;
+			d_listBuffer[listIndex].endIndex = x ;
 			d_listBuffer[listIndex].nextPt = 0;
 			nextPtr = (unsigned int *)(&(d_listBuffer[listIndex].nextPt));
 			etype = isVolumn;
@@ -79,7 +79,7 @@ __global__ void countRowKernel(int kernelWidth, int kernelHeight)
 		{
 			//printf("end :%d\n", x);
 
-			d_listBuffer[listIndex].endIndex = x;
+			d_listBuffer[listIndex].endIndex = x-1;
 			etype = notVolumn;
 		}
 
@@ -104,9 +104,9 @@ __device__ void FillSpan(int beginX, int endX, int y,float2 beginUv,float2 endUv
 	for (int x = beginX; x < top; x++)
 	{
 		int index = y*d_outTextureWidth+x;
-		float uvx = beginUv.x + (endUv.x - beginUv.x) / (top - 1)*x;
+		float uvx = beginUv.x + (endUv.x - beginUv.x)*(x-beginX) / (top -beginX);
 		d_cudaTexture[index] = tex2D(cudaColorTex, uvx, beginUv.y);
-		//printf("fillPixel(%d,%d),index%d  (%f,%f)\t", x, y, index, uvx, beginUv.y);
+	//	printf("fillPixel(%d,%d),index%d  (%f,%f)\n", x, y, index, uvx, beginUv.y);
 
 	}
 }
@@ -127,29 +127,42 @@ __global__ void renderToTexutre(int kernelWidth, int kernelHeight)
 	int acuumPixel =0,span =0;
 	//("begin:%d,end%d,index:%d\n", currentNote.beginIndex, currentNote.endIndex, currentNote.nextPt);
 	//printf("init:%d\n", d_cudaPboBuffer[listIndex].x);
-	while (currentNote.nextPt != 0)
+	/*while (currentNote.nextPt != 0)
 	{
 		currentNote = d_listBuffer[currentNote.nextPt];
+		rowLength += currentNote.endIndex - currentNote.beginIndex;
+	}*/
+	float factor = imageWidth*1.0 / rowLength;
+
+	currentNote = *((ListNote*)&d_cudaPboBuffer[listIndex]);
+	while (currentNote.nextPt != 0)
+	{
+
+
+		currentNote = d_listBuffer[currentNote.nextPt];
+		//printf("current:b:%d,e:%d,n:%d\n", currentNote.beginIndex, currentNote.endIndex, currentNote.nextPt);
+
 		texEnd = currentNote.endIndex;
 		span = currentNote.endIndex - currentNote.beginIndex;
 		fillBegin = texBegin + acuumPixel;
 		fillEnd = texEnd + acuumPixel;
-		FillSpan(fillBegin, fillEnd, y, toUv(texBegin, y), toUv(texEnd, y));
-		FillVolumn(fillEnd, fillEnd+span, y);
-		
+		FillSpan(fillBegin*factor, fillEnd*factor, y, toUv(texBegin, y), toUv(texEnd, y));
+		FillVolumn(fillEnd*factor, (fillEnd + span)*factor, y);
+
 		acuumPixel += span;
 		texBegin = currentNote.endIndex;
+		//printf("texBegin:%d,acuumPixel:%d,n:%d\n", texBegin, acuumPixel);
 		
 	}
 	fillBegin = texBegin + acuumPixel;
 	//printf("final:(%d,%d) u(%f,%f)\n", fillBegin, imageWidth + span, toUv(texBegin, y).x, toUv(imageWidth - 1, y).x);
 
-	FillSpan(fillBegin, imageWidth + span, y, toUv(texBegin, y), toUv(imageWidth - 1, y));
+	FillSpan(fillBegin*factor, (imageWidth + span)*factor, y, toUv(texBegin, y), toUv(imageWidth - 1, y));
 
 	
 }
 ListNote *device_data = NULL;
-int atomBuffer = 0;
+int atomBuffer = 1;
 #ifdef DEBUG
 	ListNote *host_data = NULL;
 #endif
