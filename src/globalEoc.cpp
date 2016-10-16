@@ -27,6 +27,10 @@ EOCrender::EOCrender(int w, int h) :m_height(h), m_width(w), m_pScene(NULL)
 	m_gbufferFbo.init();
 	m_edgeFbo = Fbo(1, m_width, m_height);
 	m_edgeFbo.init();
+	glBindTexture(GL_TEXTURE_2D, m_edgeFbo.getTexture(0));
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D,0);
 	m_occludedBuffer = Fbo(1, m_width, m_height);
 	m_occludedBuffer.init();
 
@@ -82,8 +86,8 @@ void EOCrender::render(textureManager & manager)
 	m_pScene->render(m_edgeShader, manager, pRenderCamera);
 	//Geometry::drawQuad(m_edgeShader);
 	//m_edgeFbo.SaveBMP("edge.bmp", 0);
-	//m_edgeFbo.debugPixel(0, 512, 512);
-	//m_edgeFbo.debugPixel(0,353, 618);
+	//m_edgeFbo.debugPixel(0, 719, 533);
+	//m_edgeFbo.debugPixel(0,603, 713);
 	m_edgeFbo.end();
 	glDisable(GL_CONSERVATIVE_RASTERIZATION_NV);
 	

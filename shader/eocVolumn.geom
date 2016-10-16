@@ -26,11 +26,9 @@ void emitVertex(vec3 pos)
 
 bool isVerticalEdge(vec2 tc, vec3 worldPos)
 {
-    bvec2 test= greaterThan(texture2D(edgeTex,tc).xy , vec2(0.5f,0.5f));
-	bool isEdge = all(test);
-		
+  	
 	
-	if(isEdge)
+	if( all( greaterThan(texture2D(edgeTex,tc).xy , vec2(0.5f,0.5f))))
 	{
 		
 		//if(length(texture2D(posTex,tc).xyz-worldPos)<0.25)
@@ -45,24 +43,20 @@ bool isVerticalEdge(vec2 tc, vec3 worldPos)
 }
 
 
-bool VerticalEdgeTest(vec3 worldPos)
+bool VerticalEdgeTest(vec3 worldPos,float length)
 {
 	vec4 temp = MVP * vec4(worldPos,1.0);
 	vec2 tc = temp.xy/temp.w *0.5+0.5;
 	vec2 step = 1.0/resolution;
-   	bool c = isVerticalEdge(tc,worldPos);
-	bool l = isVerticalEdge(tc-vec2(step.x,0),worldPos);
-	bool r = isVerticalEdge(tc+vec2(step.x,0),worldPos);
-	bool t = isVerticalEdge(tc+vec2(0,step.y),worldPos);
-	bool b = isVerticalEdge(tc-vec2(0,step.y),worldPos);
-	//return c||l||r||t||b;
-
-	bool tr = isVerticalEdge(tc+vec2(step.x,step.y),worldPos);
-	bool bl = isVerticalEdge(tc-vec2(step.x,step.y),worldPos);
-	bool tl = isVerticalEdge(tc+vec2(step.x,-step.y),worldPos);
-	bool br = isVerticalEdge(tc+vec2(-step.x,step.y),worldPos);
-
-	return c||l||r||t||b||tr||bl||tl||br;
+	for (float x = -length;x<=length;x++)
+	{
+		for (float y = -length;y<=length;y++)
+		{
+			 if(isVerticalEdge(tc+vec2(step.x*x,step.y*y),worldPos))
+				return true;
+		}
+	}
+	return false;
 }
 
 void main()
@@ -72,7 +66,7 @@ void main()
 	vec3 point1,point2,tex1,tex2;
 	for(int i = 0;i<gl_in.length();i++)
 	{
-		int vIsEdgeI = int(VerticalEdgeTest( worldPos[i]));
+		int vIsEdgeI = int(VerticalEdgeTest( worldPos[i],1.5));
 		isEdgeNum +=vIsEdgeI;
 		
 		if((isEdgeNum==1) && (vIsEdgeI == 1))
@@ -87,7 +81,7 @@ void main()
 	if(isEdgeNum==2)
 	{
 		vec3 midPoint = (point1+point2)/2;
-		if(VerticalEdgeTest(midPoint))
+		if(VerticalEdgeTest(midPoint,2))
 		{
 			
 			const float farDis = 150;
@@ -100,12 +94,6 @@ void main()
 			emitVertex(point1);
 			emitVertex(point2);
 		}
-			/*
-			emitVertex(worldPos[0]);
-			emitVertex(worldPos[2]);
-			emitVertex(worldPos[1]);
-			emitVertex(eocCameraPos);
-			*/
 		
 	}
 	EndPrimitive();

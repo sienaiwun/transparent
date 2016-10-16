@@ -1,8 +1,8 @@
 #version 430
 
-in vec3 worldPos;
+in vec3 worldPosP;
 in vec3 worldNormal;
-in vec2 tc;
+in vec2 tct;
 
 uniform sampler2D colorTex;
 
@@ -49,7 +49,7 @@ vec4 firstDisconect(vec2 tc,vec3 worldPos)
 {
 	vec2 step = 1.0/resolution;
     vec4 result;
-	float c = getDepthRep(worldPos);
+	float c = getDepthTx(tc);
 	float l = getDepthTx(tc-vec2(step.x,0));
 	float r = getDepthTx(tc+vec2(step.x,0));
 	float t = getDepthTx(tc+vec2(0,step.y));
@@ -59,7 +59,24 @@ vec4 firstDisconect(vec2 tc,vec3 worldPos)
 	return result;
 }
 
-
+vec2 getTc(vec3 worldPos)
+{
+	vec4 temp = MVP*vec4(worldPos,1);
+	return temp.xy/temp.w *0.5+0.5;
+}
+bool isHeiher(vec2 uv,vec3 originPos)
+{
+	vec3 texPos = texture2D(posTex,uv).xyz;
+	return (length(originPos-cameraPos)-length(texPos-cameraPos))>5.004;
+}
+bool leftIsHigher(vec2 tc,vec3 originPos)
+{
+	vec2 step = 1.0/resolution;
+	bool l = isHeiher(tc+vec2(-step.x,0),originPos);
+	//bool lt =  isHeiher(tc+vec2(-step.x,step.y),originPos);
+	//bool lb =  isHeiher(tc+vec2(-step.x,-step.y),originPos);
+	return l;
+}
 void main()
 {
 	vec2 ndc = (gl_FragCoord.xy)/resolution;
@@ -70,16 +87,30 @@ void main()
 	if(abs(norm.z)>0.6)
 		discard;
 
-	if(length(orginPos-cameraPos)-length(worldPos-cameraPos)>0.004)
+	if(length(orginPos-cameraPos)-length(worldPosP-cameraPos)>0.004)
 		;
 	else
 		discard;
-	if(length(orginPos-worldPos)>8.004)
+	if(length(orginPos-worldPosP)>8.004)
 		;
 	else
 		discard;
-		
-	color0.xyzw = firstDisconect(ndc,worldPos);  //tc get by mvp
+	vec2 stept = 1.0/resolution;
+	//color0.xyzw = firstDisconect(ndc,worldPos);  //tc get by mvp
 	color0.x = 1;
+	if(leftIsHigher(ndc,orginPos))
+		color0.y = 1;
 	color0.z = 1;
+	return;
+	color0.xy = (ndc+vec2(-stept.x,0))*1024;
+	
+	vec3 neoPos =  texture2D(posTex,ndc+vec2(-stept.x,0)).xyz;
+
+	color0.xyz = neoPos;
+	if(isHeiher(ndc+vec2(-stept.x,0),orginPos))
+		color0.y = 1.1;
+//	color0.y = length(neoPos-cameraPos)-length(orginPos-cameraPos);
+	return;
+	
+		
 }

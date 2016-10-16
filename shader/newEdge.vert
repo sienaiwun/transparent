@@ -7,9 +7,9 @@ layout (location = 0) in vec3 VertexPosition;
 layout (location = 1) in vec3 VertexNormal;
 layout (location = 2) in vec2 VertexTc;
 
-out vec3 worldPos;
+out vec3 worldPosP;
 out vec3 worldNormal;
-out vec2 tc;
+out vec2 tct;
 //out int out_vertexId;
 vec2 TransformViewToProjection(vec2 v)
 { 
@@ -35,9 +35,9 @@ vec2 offset(vec3 pos,vec3 normal)
 void main()
 {
 	const float _Outline = 0.045;
-	worldPos = VertexPosition;
+	worldPosP = VertexPosition;
 	worldNormal = normalize(VertexNormal);
-	tc = vec2(VertexTc.x,VertexTc.y);
+	tct = vec2(VertexTc.x,VertexTc.y);
 	gl_Position = MVP * vec4(VertexPosition ,1.0);
 	gl_Position/=gl_Position.w;
 	gl_Position.xy += offset(VertexPosition,worldNormal)*1.0/1024*1;
