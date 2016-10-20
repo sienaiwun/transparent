@@ -1,6 +1,7 @@
 #version 430
 uniform mat4 MVP; // Projection * ModelView
 uniform mat4 modeViewInv;
+uniform mat4 mvpInv;
 uniform mat4 projection;
 //in int gl_VertexID;
 layout (location = 0) in vec3 VertexPosition;
@@ -35,12 +36,16 @@ vec2 offset(vec3 pos,vec3 normal)
 void main()
 {
 	const float _Outline = 0.045;
-	worldPosP = VertexPosition;
+
 	worldNormal = normalize(VertexNormal);
 	tct = vec2(VertexTc.x,VertexTc.y);
 	gl_Position = MVP * vec4(VertexPosition ,1.0);
 	gl_Position/=gl_Position.w;
 	gl_Position.xy += offset(VertexPosition,worldNormal)*1.0/1024*1;
+
+	vec4 temp = mvpInv* gl_Position;
+	worldPosP = temp.xyz/temp.w;
+	gl_Position = MVP * vec4(worldPosP ,1.0);
 	//vec3 norm   =  (mat3(modeViewInv)* worldNormal);
 	//vec2 offset = TransformViewToProjection(norm.xy);
 	//gl_Position.xy += offset * gl_Position.z * _Outline;

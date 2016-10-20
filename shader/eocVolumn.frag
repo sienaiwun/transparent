@@ -48,9 +48,39 @@ bool VerticalEdgeTest(vec2 tc,vec3 worldPos)
 	return c||l||r||t||b||tr||bl||tl||br;
 }
 
+bool isTcOnVerticalEdge(vec2 tc)
+{
+	return   texture2D(edgeTex,tc).x >0.5f;
+}
+vec2 inToNdcPos(vec3 pos)
+{
+	vec4 temp = MVP* vec4(pos,1);
+	return temp.xy/temp.w * 0.5+vec2(0.5,0.5);
+}
 void main()
 {
+
 	vec2 ndc = (gl_FragCoord.xy)/resolution;
+/*	
+	vec2 tc = pWorldPos.xy*0.5+0.5;
+	vec3 edgePos = texture2D(edgeTex,tc).yzw;
+	FragColor0.xyz = vec3(edgePos);
+	vec2 step = 1.0/resolution;
+	vec2 bot = tc + vec2(0,-step.y);
+	FragColor0.x = float(isTcOnVerticalEdge(bot));
+	vec2 botLeft = tc + vec2(-step.x,-step.y);
+		FragColor0.y = float(isTcOnVerticalEdge(botLeft));
+
+		vec2 botRight = tc + vec2(step.x,-step.y);
+		FragColor0.z = float(isTcOnVerticalEdge(botRight));
+		
+	vec2 right = tc + vec2(step.x,0);
+	FragColor0.w = float(isTcOnVerticalEdge(bot));
+	FragColor0.xyz =  texture2D(posTex,botLeft).xyz;
+	FragColor0.xy = inToNdcPos(texture2D(edgeTex,bot).yzw)*1024.0;
+	FragColor0.zw = bot*1024;
+	return;
+	*/
 	
 	vec3 gBufferPos = texture2D(posTex,ndc).xyz;
 	if(length(gBufferPos-cameraPos)>length(pWorldPos-cameraPos))
@@ -64,6 +94,7 @@ void main()
 	float ka = 0.2;
 	FragColor0.xyz = vec3(1,1,1);
 	return;
+	
 	/*
 	vec3 outColor;
 	if(VerticalEdgeTest(ndc,worldPos))

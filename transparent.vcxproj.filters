@@ -55,6 +55,9 @@
     <Filter Include="Source Files\shader\newEdgeShader">
       <UniqueIdentifier>{90497439-9432-4c9b-9ecc-fd658a45b07b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\shader\progateShader">
+      <UniqueIdentifier>{e4437671-01c2-4f8e-9d30-9b4f7da5efea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\glslShader.h">
@@ -147,6 +150,9 @@
     <ClInclude Include="src\gbufferShader.h">
       <Filter>Source Files\shader\diffuseShader</Filter>
     </ClInclude>
+    <ClInclude Include="src\progShader.h">
+      <Filter>Source Files\shader\progateShader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera.cpp">
@@ -224,6 +230,9 @@
     <ClCompile Include="src\newEdge.cpp">
       <Filter>Source Files\shader\newEdgeShader</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProgShader.cpp">
+      <Filter>Source Files\shader\progateShader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\gBuffer.frag">
@@ -285,6 +294,12 @@
     </None>
     <None Include="shader\newEdge.vert">
       <Filter>Source Files\shader\newEdgeShader</Filter>
+    </None>
+    <None Include="shader\propagate.frag">
+      <Filter>Source Files\shader\progateShader</Filter>
+    </None>
+    <None Include="shader\propagate.vert">
+      <Filter>Source Files\shader\progateShader</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

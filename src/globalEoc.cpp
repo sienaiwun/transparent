@@ -27,23 +27,37 @@ EOCrender::EOCrender(int w, int h) :m_height(h), m_width(w), m_pScene(NULL)
 	m_gbufferFbo.init();
 	m_edgeFbo = Fbo(1, m_width, m_height);
 	m_edgeFbo.init();
+	m_progFbo = Fbo(1, m_width, m_height);
+	m_progFbo.init();
 	glBindTexture(GL_TEXTURE_2D, m_edgeFbo.getTexture(0));
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D,0);
+	glBindTexture(GL_TEXTURE_2D, m_progFbo.getTexture(0));
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	m_occludedBuffer = Fbo(1, m_width, m_height);
 	m_occludedBuffer.init();
 
 	m_edgeShader.init();
+	m_edgeShader.setGbuffer(&m_gbufferFbo);
+	m_edgeShader.setRes(nv::vec2f(m_width, m_height));
+
+
 	m_gbufferShader.init();
 
 	m_volumnShader.init();
 	m_volumnShader.setRes(nv::vec2f(m_width, m_height));
 	
 	
-	m_edgeShader.setGbuffer(&m_gbufferFbo);
-	m_edgeShader.setRes(nv::vec2f(m_width, m_height));
 	
+	g_progShader.init();
+	g_progShader.setGbuffer(&m_gbufferFbo);
+	g_progShader.setRes(nv::vec2f(m_width, m_height));
+	g_progShader.setEdgeFbo(&m_edgeFbo);
+
 	m_blendShader.init();
 	
 	m_pQuad = new QuadScene();
@@ -90,14 +104,19 @@ void EOCrender::render(textureManager & manager)
 	//Geometry::drawQuad(m_edgeShader);
 	//m_edgeFbo.SaveBMP("edge.bmp", 0);
 	//m_edgeFbo.debugPixel(0, 719, 533);
-	//m_edgeFbo.debugPixel(0,603, 713);
+	//m_edgeFbo.debugPixel(0,659, 674);
 	m_edgeFbo.end();
 	glDisable(GL_CONSERVATIVE_RASTERIZATION_NV);
 	
+	m_progFbo.begin();
+	Geometry::drawQuad(g_progShader);
+	//m_progFbo.SaveBMP("prog.bmp", 0);
+	//m_progFbo.debugPixel(0, 652, 379);
+	m_progFbo.end();
 	m_volumnShader.setCamera(pOriginCam);
 	m_volumnShader.setGbuffer(&m_gbufferFbo);
 	m_volumnShader.setDiffuse(nv::vec3f(1, 0, 0));
-	m_volumnShader.setEdgeFbo(&m_edgeFbo);
+	m_volumnShader.setEdgeFbo(&m_progFbo);
 	CHECK_ERRORS();
 	m_volumnShader.setEocCamera(m_eocRightCam.getEocCameraP()->getCameraPos());
 	CHECK_ERRORS();
@@ -120,7 +139,7 @@ void EOCrender::render(textureManager & manager)
 	 
 	m_renderFbo.begin();
 	Geometry::drawQuad(m_blendShader);
-//	m_renderFbo.SaveBMP("test.bmp", 0);
+	//m_renderFbo.SaveBMP("test.bmp", 0);
 
 	m_renderFbo.end();
 	

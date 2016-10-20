@@ -104,16 +104,16 @@ void main()
 		vec2 right = tc + vec2(step.x,0);
 		emitVolume(samplePos,right);
 	}
-	
 	/*
+	
 	//debug pixel
 	emitTcVertex(vec2(-1,-1),worldPos[0]);
 	emitTcVertex(vec2(-1,1),worldPos[0]);
 	emitTcVertex(vec2(1,-1),worldPos[0]);
 	emitTcVertex(vec2(1,1),worldPos[0]);
 	EndPrimitive();
-	return;*/
-
+	return;
+	*/
 	/*origin method
     int isEdgeNum = 0;
 	vec3 point1,point2,tex1,tex2;

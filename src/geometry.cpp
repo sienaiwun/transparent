@@ -376,6 +376,7 @@ GLuint Geometry::initImageMesh(int w, int h)
 		GLuint newIndex = glGenLists(1);;
 		glNewList(newIndex, GL_COMPILE);
 		glBegin(GL_POINTS);
+		//float x = 659.5, y = 675.5;
 		for (float x = 0.5; x < w; x++)
 		{
 			for (float y = 0.5; y < h; y++)

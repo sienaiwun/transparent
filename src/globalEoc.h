@@ -3,6 +3,7 @@
 #include "edgeShader.h"
 #include "newEdge.h"
 #include "gbufferShader.h"
+#include "progShader.h"
 #include "eocCamera.h"
 #include "eocVolumn.h"
 #include "fbo.h"
@@ -62,6 +63,7 @@ private:
 	GbufferShader m_gbufferShader;
 	BlendShader m_blendShader;
 	EocVolumnShader m_volumnShader;
+	ProgShader g_progShader;
 	 Scene * m_pScene,*m_pQuad;
 	GLuint m_width, m_height, m_k;
 	int m_total_pixel;
@@ -69,6 +71,7 @@ private:
 	GLuint *m_data;
 	Fbo m_renderFbo;
 	Fbo m_edgeFbo;
+	Fbo m_progFbo;
 	Fbo m_gbufferFbo;
 	Fbo m_occludedBuffer;
 	Fbo debugFbo;
