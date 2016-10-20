@@ -47,7 +47,7 @@ EOCrender::EOCrender(int w, int h) :m_height(h), m_width(w), m_pScene(NULL)
 	m_blendShader.init();
 	
 	m_pQuad = new QuadScene();
-	m_eocRightCam = EocCamera(is_Right, 0.1, 50);
+	m_eocRightCam = EocCamera(is_Right, 5, 50);
 	m_debugSwap = false;
 	
 	pCounter = new RowCounter(w, h);
@@ -56,6 +56,9 @@ EOCrender::EOCrender(int w, int h) :m_height(h), m_width(w), m_pScene(NULL)
 
 	pCounter->setEdgeBuffer(&m_edgeFbo);
 	pCounter->init();
+
+	Geometry::initImageMesh(m_width, m_height);
+
 }
 static bool once = true;;
 void EOCrender::render(textureManager & manager)
@@ -95,13 +98,20 @@ void EOCrender::render(textureManager & manager)
 	m_volumnShader.setGbuffer(&m_gbufferFbo);
 	m_volumnShader.setDiffuse(nv::vec3f(1, 0, 0));
 	m_volumnShader.setEdgeFbo(&m_edgeFbo);
+	CHECK_ERRORS();
 	m_volumnShader.setEocCamera(m_eocRightCam.getEocCameraP()->getCameraPos());
+	CHECK_ERRORS();
+
 	m_occludedBuffer.begin();
-	 
-	m_pScene->render(m_volumnShader, manager, pRenderCamera);
+	CHECK_ERRORS();
+	Geometry::drawQuadMesh(m_volumnShader, m_width, m_height);
+	//m_pScene->render(m_volumnShader, manager, pRenderCamera);
 	//m_occludedBuffer.SaveBMP("test.bmp", 0);
+	//m_occludedBuffer.debugPixel(0, 512, 512);
+	CHECK_ERRORS();
+
 	m_occludedBuffer.end();
-	
+	CHECK_ERRORS();
 	 
 
 

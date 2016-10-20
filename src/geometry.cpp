@@ -1,5 +1,5 @@
 #include "geometry.h"
-
+#include <map> 
 Geometry::Geometry(const char* fileName/*const GLMmodel * glmodel*/) :_mainModel(true), _baseVertexID(0)
 {
 	_glmodel = glmReadOBJ(fileName);
@@ -364,6 +364,56 @@ void Geometry::drawQuad(glslShader& shader)
 	glVertex2f(1.0f, 1.0f);
 	glVertex2f(-1.0f, 1.0f);
 	glEnd();
+	shader.end();
+}
+std::map<nv::vec2i, GLuint> g_drawIndexMap;
+GLuint Geometry::initImageMesh(int w, int h)
+{
+	nv::vec2i index = nv::vec2i(w, h);
+	std::map<nv::vec2i, GLuint>::iterator it = g_drawIndexMap.find(index);
+	if (it == g_drawIndexMap.end())
+	{
+		GLuint newIndex = glGenLists(1);;
+		glNewList(newIndex, GL_COMPILE);
+		glBegin(GL_POINTS);
+		for (float x = 0.5; x < w; x++)
+		{
+			for (float y = 0.5; y < h; y++)
+			{
+				//change
+				float beginX = -1.0f + 2.0*  x / (w);
+				float beginY = -1.0f + 2.0 * y / (h);
+				glVertex2f(beginX, beginY);
+			}
+		}
+		glEnd();
+		glEndList();
+		g_drawIndexMap.insert(pair<nv::vec2i, GLuint>(index, newIndex));
+		return newIndex;
+	}
+	else
+		return it->second;
+}
+std::map<GLuint, GLuint> testMap;
+void Geometry::drawQuadMesh(glslShader& shader,int m_w,int m_h)
+{
+	nv::vec2i index = nv::vec2i(m_w, m_h);
+	std::map<nv::vec2i, GLuint>::iterator it = g_drawIndexMap.find(index); 
+	int renderListId;
+
+	std::map<GLuint, GLuint>::iterator testIt = testMap.find(1);
+	if (it == g_drawIndexMap.end())
+	{
+		renderListId = Geometry::initImageMesh(m_w,m_h);
+	}
+	else
+	{
+		renderListId = it->second;
+	}
+
+	shader.begin();
+	glEnable(GL_TEXTURE_2D);
+	glCallList(renderListId);
 	shader.end();
 }
 void Geometry::drawTriangle(nv::vec3f newOrigin, glslShader& shader)

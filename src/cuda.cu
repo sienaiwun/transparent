@@ -127,11 +127,11 @@ __global__ void renderToTexutre(int kernelWidth, int kernelHeight)
 	int acuumPixel =0,span =0;
 	//("begin:%d,end%d,index:%d\n", currentNote.beginIndex, currentNote.endIndex, currentNote.nextPt);
 	//printf("init:%d\n", d_cudaPboBuffer[listIndex].x);
-	/*while (currentNote.nextPt != 0)
+	while (currentNote.nextPt != 0)
 	{
 		currentNote = d_listBuffer[currentNote.nextPt];
 		rowLength += currentNote.endIndex - currentNote.beginIndex;
-	}*/
+	}
 	float factor = imageWidth*1.0 / rowLength;
 
 	currentNote = *((ListNote*)&d_cudaPboBuffer[listIndex]);

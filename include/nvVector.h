@@ -233,6 +233,12 @@ public:
         return r;
     }
 
+	bool operator <(const vec2<T>& rhs) const
+	{
+		return x < rhs.x || (x == rhs.x && y < rhs.y);
+	}
+
+
     // inequality
     friend bool operator != ( const vec2<T> &lhs, const vec2<T> &rhs ) {
         bool r = true;

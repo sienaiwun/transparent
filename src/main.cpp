@@ -116,7 +116,7 @@ void Display()
 	drawTex(pEoc->getCudaTex());
 	drawTex(pEoc->getGbufferP()->getTexture(0), true, nv::vec2f(0.75, 0.75));
 	drawTex(pEoc->getOccludeFbo()->getTexture(0), true, nv::vec2f(0.75, 0.00), nv::vec2f(1, 0.25));
-	drawTex(pEoc->getEdgeBufferP()->getTexture(0), true, nv::vec2f(0.75, 0.25), nv::vec2f(1, 0.50));
+	drawTex(pEoc->getRenderFbo()->getTexture(0), true, nv::vec2f(0.75, 0.25), nv::vec2f(1, 0.50));
 
 	if (drawFps ) {
 		static char fps_text[32];

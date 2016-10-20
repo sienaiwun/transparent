@@ -55,6 +55,6 @@ bool VerticalEdgeTest(vec2 tc,vec3 worldPos)
 void main()
 {
 	worldPos = VertexPosition;
-	gl_Position =  MVP * vec4(VertexPosition,1.0);
+	gl_Position =  vec4(VertexPosition,1.0);
 	
 }
