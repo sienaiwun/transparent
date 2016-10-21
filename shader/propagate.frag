@@ -113,7 +113,7 @@ void main()
 				{
 					return;
 				}
-				else if(assignPos(tc+vec2(-step.x,0)))
+				else if(assignPos(tc+vec2(step.x,sign.y*step.y)))
 				{
 					return;
 				}
@@ -150,14 +150,8 @@ void main()
 			}
 			else
 			{
-					if(isEdge(tc + vec2(0.0,step.y)))
-					{
-						sign.y = 1;
-					}
-					else if(isEdge(tc + vec2(0,-step.y)))
-					{
-						sign.y = -1;
-					}
+
+					
 				 if (assignPos(tc+vec2(-step.x,0)))
 				 {
 					return;
@@ -166,7 +160,7 @@ void main()
 				 {
 					return;
 				 }
-				  else if (assignPos(tc+vec2(0,sign.y*step.y)))
+				  else if (assignPos(tc+vec2(-step.x,-sign.y*step.y)))
 				 {
 					return;
 				 }

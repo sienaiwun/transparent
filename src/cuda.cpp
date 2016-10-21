@@ -137,7 +137,7 @@ void CudaPboResource::generateTex()
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pTexture);
 
 		
-		Fbo::SaveBMP("a.bmp", pTexture, m_width, m_height);
+		Fbo::SaveBMP("b.bmp", pTexture, m_width, m_height);
 
 		glBindTexture(GL_TEXTURE_2D, 0);//TexPosId   PboTex*/
 #endif

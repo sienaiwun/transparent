@@ -68,7 +68,7 @@ EOCrender::EOCrender(int w, int h) :m_height(h), m_width(w), m_pScene(NULL)
 	pCounter->setGbuffer(&m_gbufferFbo);
 	pCounter->setOccludorBuffer(&m_occludedBuffer);
 
-	pCounter->setEdgeBuffer(&m_edgeFbo);
+	pCounter->setEdgeBuffer(&m_progFbo);
 	pCounter->init();
 
 	Geometry::initImageMesh(m_width, m_height);
@@ -139,7 +139,7 @@ void EOCrender::render(textureManager & manager)
 	 
 	m_renderFbo.begin();
 	Geometry::drawQuad(m_blendShader);
-	//m_renderFbo.SaveBMP("test.bmp", 0);
+	//m_renderFbo.SaveBMP("test2.bmp", 0);
 
 	m_renderFbo.end();
 	

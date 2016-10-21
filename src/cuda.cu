@@ -1,6 +1,6 @@
 #include "cuda.h"
 
-texture<float4, 2, cudaReadModeElementType> cudaEdgeTex;
+texture<float4, 2, cudaReadModeElementType> cudaProgTex;
 texture<float4, 2, cudaReadModeElementType> cudaOccuderTex;
 texture<float4, 2, cudaReadModeElementType> cudaColorTex;
 cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc(32, 32, 32, 32, cudaChannelFormatKindFloat);
@@ -38,6 +38,10 @@ __device__ bool isVolume(float2 uv, int *state)
 	float4 value = tex2D(cudaOccuderTex, uv.x, uv.y);
 	return value.x > 0.5;
 }
+__device__ bool isEdge(float2 uv, int * state)
+{
+	return tex2D(cudaProgTex,uv.x, uv.y).x > 0.5;
+}
 __device__ float2 toUv(int x, int y)
 {
 	return make_float2(x + 0.5, y + 0.5);
@@ -47,8 +51,8 @@ __global__ void countRowKernel(int kernelWidth, int kernelHeight)
 	int y = __umul24(blockIdx.y, blockDim.y) + threadIdx.y;
 	if ( y > kernelHeight)
 		return;
-	//if (y != 599)
-	//	return;
+//	if (y != 807)
+//		return;
 	int arrayNum = y;
 	int accumNum = 0;
 	int state = 0;
@@ -75,11 +79,11 @@ __global__ void countRowKernel(int kernelWidth, int kernelHeight)
 			
 			
 		}
-		else if (!isVolume(currentUv, &state) && etype == isVolumn)
+		else if (etype == isVolumn && isEdge(currentUv, &state)  )
 		{
 			//printf("end :%d\n", x);
 
-			d_listBuffer[listIndex].endIndex = x-1;
+			d_listBuffer[listIndex].endIndex = x;
 			etype = notVolumn;
 		}
 
@@ -100,7 +104,7 @@ __device__ void FillVolumn(int beginX, int endX, int y)
 __device__ void FillSpan(int beginX, int endX, int y,float2 beginUv,float2 endUv)
 {
 	int top = min(endX, d_outTextureWidth);
-	//printf("tx: begin:%d,end:%d,top:%d,(%f,%f)\n",beginX,endX,top,beginUv.x,endUv.x);
+//	printf("tx: begin:%d,end:%d,top:%d,(%f,%f)\n",beginX,endX,top,beginUv.x,endUv.x);
 	for (int x = beginX; x < top; x++)
 	{
 		int index = y*d_outTextureWidth+x;
@@ -118,46 +122,46 @@ __global__ void renderToTexutre(int kernelWidth, int kernelHeight)
 	int listIndex = y;
 	int rowLength = imageWidth;
 	ListNote currentNote =* ((ListNote*)&d_cudaPboBuffer[listIndex]);
-	//if (y != 599)
+	//if (y != 807)
 	//	return;
 	int texEnd =0;
 	int texBegin = 0;
 	int fillBegin = 0;
 	int fillEnd = 0;
 	int acuumPixel =0,span =0;
-	//("begin:%d,end%d,index:%d\n", currentNote.beginIndex, currentNote.endIndex, currentNote.nextPt);
-	//printf("init:%d\n", d_cudaPboBuffer[listIndex].x);
-	while (currentNote.nextPt != 0)
+	//("begin:%d,end%d,index:%d\n", currentNote.beginIndex, currentNote.endIndex, currentNote.nextPt);*	printf("init:%d\n", d_cudaPboBuffer[listIndex].x);
+	/*while (currentNote.nextPt != 0)
 	{
 		currentNote = d_listBuffer[currentNote.nextPt];
 		rowLength += currentNote.endIndex - currentNote.beginIndex;
-	}
+		//printf("begin:%d,end%d,index:%d,length:%d\n", currentNote.beginIndex, currentNote.endIndex, currentNote.nextPt,rowLength);
+	}*/
+	//printf("printf:%d\n", rowLength);
 	float factor = imageWidth*1.0 / rowLength;
-
 	currentNote = *((ListNote*)&d_cudaPboBuffer[listIndex]);
 	while (currentNote.nextPt != 0)
 	{
 
 
 		currentNote = d_listBuffer[currentNote.nextPt];
-		//printf("current:b:%d,e:%d,n:%d\n", currentNote.beginIndex, currentNote.endIndex, currentNote.nextPt);
+	//	printf("current:b:%d,e:%d,n:%d\n", currentNote.beginIndex, currentNote.endIndex, currentNote.nextPt);
 
 		texEnd = currentNote.endIndex;
 		span = currentNote.endIndex - currentNote.beginIndex;
 		fillBegin = texBegin + acuumPixel;
 		fillEnd = texEnd + acuumPixel;
-		FillSpan(fillBegin*factor, fillEnd*factor, y, toUv(texBegin, y), toUv(texEnd, y));
-		FillVolumn(fillEnd*factor, (fillEnd + span)*factor, y);
+		FillSpan(fillBegin*factor, fillEnd*factor, y, toUv(texBegin, y), toUv(texEnd, y));  //for Ñ­»·£¬×ó±ÕÓÒ¿ª
+		FillVolumn((fillEnd)*factor, (fillEnd + span)*factor, y);
 
 		acuumPixel += span;
 		texBegin = currentNote.endIndex;
-		//printf("texBegin:%d,acuumPixel:%d,n:%d\n", texBegin, acuumPixel);
+	//	printf("texBegin:%d,acuumPixel:%d,n:%d\n", texBegin, acuumPixel);
 		
 	}
 	fillBegin = texBegin + acuumPixel;
 	//printf("final:(%d,%d) u(%f,%f)\n", fillBegin, imageWidth + span, toUv(texBegin, y).x, toUv(imageWidth - 1, y).x);
 
-	FillSpan(fillBegin*factor, (imageWidth + span)*factor, y, toUv(texBegin, y), toUv(imageWidth - 1, y));
+	FillSpan(fillBegin*factor, (imageWidth + acuumPixel)*factor, y, toUv(texBegin, y), toUv(imageWidth - 1, y));
 
 	
 }
@@ -240,8 +244,8 @@ extern "C"  void cudaRelateTex(CudaTexResourse * pResouce)
 	}
 	else if (edgebuffer_t == pResouce->getType())
 	{
-		checkCudaErrors(cudaBindTextureToArray(cudaEdgeTex, tmpcudaArray, channelDesc));
-		cudaEdgeTex.filterMode = cudaFilterModePoint;
+		checkCudaErrors(cudaBindTextureToArray(cudaProgTex, tmpcudaArray, channelDesc));
+		cudaProgTex.filterMode = cudaFilterModePoint;
 	}
 	else if (color_t == pResouce->getType())
 	{
